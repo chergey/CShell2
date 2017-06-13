@@ -59,11 +59,11 @@ namespace CShell.Sinks.Charting
             // Validate input
             if (chartControl == null)
             {
-                throw (new ArgumentNullException("chartControl"));
+                throw (new ArgumentNullException(nameof(chartControl)));
             }
             if (chartControl.Series.IndexOf(dataSeriesName) < 0)
             {
-                throw (new ArgumentException("Series with name'" + dataSeriesName + "' was not found.", "dataSeriesName"));
+                throw (new ArgumentException("Series with name'" + dataSeriesName + "' was not found.", nameof(dataSeriesName)));
             }
 
             // Make data series invisible
@@ -201,7 +201,7 @@ namespace CShell.Sinks.Charting
             // If the interval is zero return error
             if (interval == 0.0)
             {
-                throw (new ArgumentOutOfRangeException("interval", "Interval can not be zero."));
+                throw (new ArgumentOutOfRangeException(nameof(interval), "Interval can not be zero."));
             }
 
             // If the real interval is > 1.0

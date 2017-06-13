@@ -5,38 +5,38 @@ namespace CShell.Hosting
 {
     public class ReplScriptExecutorFactory : IReplScriptExecutorFactory
     {
-        private readonly IReplOutput replOutput;
-        private readonly IDefaultReferences defaultReferences;
-        private readonly ScriptServices scriptServices;
+        private readonly IReplOutput _replOutput;
+        private readonly IDefaultReferences _defaultReferences;
+        private readonly ScriptServices _scriptServices;
 
         public ReplScriptExecutorFactory(ScriptServices scriptServices, IReplOutput replOutput, IDefaultReferences defaultReferences)
         {
-            this.scriptServices = scriptServices;
-            this.replOutput = replOutput;
-            this.defaultReferences = defaultReferences;
+            this._scriptServices = scriptServices;
+            this._replOutput = replOutput;
+            this._defaultReferences = defaultReferences;
         }
 
         public IReplScriptExecutor Create(string workspaceDirectory)
         {
-            scriptServices.FileSystem.CurrentDirectory = workspaceDirectory;
-            scriptServices.InstallationProvider.Initialize();
+            _scriptServices.FileSystem.CurrentDirectory = workspaceDirectory;
+            _scriptServices.InstallationProvider.Initialize();
 
             var replExecutor = new ReplScriptExecutor(
-                replOutput, 
-                scriptServices.ObjectSerializer, 
-                scriptServices.FileSystem, 
-                scriptServices.FilePreProcessor,
-                scriptServices.Engine,
-                scriptServices.LogProvider,
-                scriptServices.ReplCommands,
-                defaultReferences
+                _replOutput, 
+                _scriptServices.ObjectSerializer, 
+                _scriptServices.FileSystem, 
+                _scriptServices.FilePreProcessor,
+                _scriptServices.Engine,
+                _scriptServices.LogProvider,
+                _scriptServices.ReplCommands,
+                _defaultReferences
                 );
 
-            var assemblies = scriptServices.AssemblyResolver.GetAssemblyPaths(scriptServices.FileSystem.CurrentDirectory);
-            var scriptPacks = scriptServices.ScriptPackResolver.GetPacks();
+            var assemblies = _scriptServices.AssemblyResolver.GetAssemblyPaths(_scriptServices.FileSystem.CurrentDirectory);
+            var scriptPacks = _scriptServices.ScriptPackResolver.GetPacks();
 
             replExecutor.Initialize(assemblies, scriptPacks);
-            replOutput.Initialize(replExecutor);
+            _replOutput.Initialize(replExecutor);
 
             return replExecutor;
         }

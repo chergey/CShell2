@@ -10,21 +10,21 @@ namespace CShell.Modules.Workspace.Results
 {
     public class AddFilesResult : ResultBase
     {
-        private readonly IEnumerable<string> files;
+        private readonly IEnumerable<string> _files;
 
         public AddFilesResult(string file)
         {
-            this.files = new string[] {file};
+            this._files = new string[] {file};
         }
 
         public AddFilesResult(IEnumerable<string> files)
         {
-            this.files = files;
+            this._files = files;
         }
 
         public override void Execute(Caliburn.Micro.CoroutineExecutionContext context)
         {
-            foreach (var file in files)
+            foreach (var file in _files)
             {
                 if(!File.Exists(file))
                 {

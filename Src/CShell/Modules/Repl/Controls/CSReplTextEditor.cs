@@ -7,19 +7,13 @@ using System.Text;
 
 namespace CShell.Modules.Repl.Controls
 {
-    public class CSReplTextEditor : CodeTextEditor
+    public class CsReplTextEditor : CodeTextEditor
     {
-        public CSRepl Repl { get; set; }
+        public CsRepl Repl { get; set; }
 
-        protected override IDocument GetCompletionDocument(out int offset)
-        {
-            return Repl.GetCompletionDocument(out offset);
-        }
+        protected override IDocument GetCompletionDocument(out int offset) => Repl.GetCompletionDocument(out offset);
 
-        protected override string[] GetNamespaces()
-        {
-            return Repl.ReplExecutor.Namespaces.ToArray();
-        }
+        protected override string[] GetNamespaces() => Repl.ReplExecutor.Namespaces.ToArray();
 
         protected override IDictionary<string, string> GetAdditionalCompletions()
         {

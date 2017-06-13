@@ -13,9 +13,9 @@ namespace CShell.Hosting
 {
     public class ReplScriptExecutor : ScriptExecutor, IReplScriptExecutor
     {
-        private readonly IReplOutput replOutput;
-        private readonly IObjectSerializer serializer;
-        private readonly IDefaultReferences defaultReferences;
+        private readonly IReplOutput _replOutput;
+        private readonly IObjectSerializer _serializer;
+        private readonly IDefaultReferences _defaultReferences;
 
         public ReplScriptExecutor(
             IReplOutput replOutput,
@@ -28,44 +28,34 @@ namespace CShell.Hosting
             IDefaultReferences defaultReferences)
             : base(fileSystem, filePreProcessor, scriptEngine, logProvider)
         {
-            this.replOutput = replOutput;
-            this.serializer = serializer;
-            this.defaultReferences = defaultReferences;
+            this._replOutput = replOutput;
+            this._serializer = serializer;
+            this._defaultReferences = defaultReferences;
             Commands = replCommands != null ? replCommands
                 .Where(x => x.GetType().Namespace.StartsWith("CShell")) //hack to only include CShell commands for now
                 .Where(x => x.CommandName != null)
                 .ToDictionary(x => x.CommandName, x => x)
                 : new Dictionary<string, IReplCommand>();
 
-            replCompletion = new CSharpCompletion(true);
-            replCompletion.AddReferences(GetReferencesAsPaths());
+            _replCompletion = new CSharpCompletion(true);
+            _replCompletion.AddReferences(GetReferencesAsPaths());
             //since it's quite expensive to initialize the "System." references we clone the REPL code completion
-            documentCompletion = replCompletion.Clone();
+            _documentCompletion = _replCompletion.Clone();
 
             AddDefaultReferencesAndNamespaces();
         }
 
-        public string WorkspaceDirectory { get { return base.FileSystem.CurrentDirectory; } }
+        public string WorkspaceDirectory => base.FileSystem.CurrentDirectory;
 
         public event EventHandler<EventArgs> AssemblyReferencesChanged;
-        protected virtual void OnAssemblyReferencesChanged()
-        {
-            EventHandler<EventArgs> handler = AssemblyReferencesChanged;
-            if (handler != null) handler(this, EventArgs.Empty);
-        }
+        protected virtual void OnAssemblyReferencesChanged() => AssemblyReferencesChanged?.Invoke(this, EventArgs.Empty);
 
-        private readonly ICompletion replCompletion;
-        private readonly ICompletion documentCompletion;
+        private readonly ICompletion _replCompletion;
+        private readonly ICompletion _documentCompletion;
 
-        public ICompletion ReplCompletion
-        {
-            get { return replCompletion; }
-        }
+        public ICompletion ReplCompletion => _replCompletion;
 
-        public ICompletion DocumentCompletion
-        {
-            get { return documentCompletion; }
-        }
+        public ICompletion DocumentCompletion => _documentCompletion;
 
 
         public string Buffer { get; private set; }
@@ -84,7 +74,7 @@ namespace CShell.Hosting
             ScriptResult result = null;
             try
             {
-                replOutput.EvaluateStarted(script, null);
+                _replOutput.EvaluateStarted(script, null);
 
                 if (script.StartsWith(":"))
                 {
@@ -196,55 +186,52 @@ namespace CShell.Hosting
             }
             finally
             {
-                replOutput.EvaluateCompleted(result);
+                _replOutput.EvaluateCompleted(result);
             }
             return result ?? ScriptResult.Empty;
         }
 
 
-        private static string GetInvalidCommandArgumentMessage(string argument)
-        {
-            return string.Format(CultureInfo.InvariantCulture, "Argument is not a valid expression: {0}", argument);
-        }
+        private static string GetInvalidCommandArgumentMessage(string argument) => string.Format(CultureInfo.InvariantCulture, "Argument is not a valid expression: {0}", argument);
 
         private void AddDefaultReferencesAndNamespaces()
         {
             AddReferences(typeof(Shell).Assembly);
             ImportNamespaces(typeof(Shell).Namespace);
-            AddReferences(this.defaultReferences.Assemblies.Distinct().ToArray());
-            AddReferences(this.defaultReferences.AssemblyPaths.Distinct().ToArray());
-            ImportNamespaces(this.defaultReferences.Namespaces.Distinct().ToArray());
+            AddReferences(this._defaultReferences.Assemblies.Distinct().ToArray());
+            AddReferences(this._defaultReferences.AssemblyPaths.Distinct().ToArray());
+            ImportNamespaces(this._defaultReferences.Namespaces.Distinct().ToArray());
         }
 
         public override void AddReferences(params Assembly[] references)
         {
             base.AddReferences(references);
-            replCompletion.AddReferences(references);
-            documentCompletion.AddReferences(references);
+            _replCompletion.AddReferences(references);
+            _documentCompletion.AddReferences(references);
             OnAssemblyReferencesChanged();
         }
 
         public override void RemoveReferences(params Assembly[] references)
         {
             base.RemoveReferences(references);
-            replCompletion.RemoveReferences(references);
-            documentCompletion.RemoveReferences(references);
+            _replCompletion.RemoveReferences(references);
+            _documentCompletion.RemoveReferences(references);
             OnAssemblyReferencesChanged();
         }
 
         public override void AddReferences(params string[] references)
         {
             base.AddReferences(references);
-            replCompletion.AddReferences(references);
-            documentCompletion.AddReferences(references);
+            _replCompletion.AddReferences(references);
+            _documentCompletion.AddReferences(references);
             OnAssemblyReferencesChanged();
         }
 
         public override void RemoveReferences(params string[] references)
         {
             base.RemoveReferences(references);
-            replCompletion.RemoveReferences(references);
-            documentCompletion.RemoveReferences(references);
+            _replCompletion.RemoveReferences(references);
+            _documentCompletion.RemoveReferences(references);
             OnAssemblyReferencesChanged();
         }
 
@@ -256,16 +243,13 @@ namespace CShell.Hosting
             return paths.ToArray();
         }
 
-        public string[] GetNamespaces()
-        {
-            return Namespaces.ToArray();
-        }
+        public string[] GetNamespaces() => Namespaces.ToArray();
 
         public override void Reset()
         {
             base.Reset();
             AddDefaultReferencesAndNamespaces();
-            replOutput.Clear();
+            _replOutput.Clear();
             ExecuteReferencesScript();
         }
 

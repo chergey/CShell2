@@ -14,12 +14,9 @@ namespace CShell.Framework.Controls
 			return base.IsItemItsOwnContainerOverride(item);
 		}
 
-		protected override DependencyObject GetContainerForItemOverride()
-		{
-			return GetContainer(this, _currentItem);
-		}
+		protected override DependencyObject GetContainerForItemOverride() => GetContainer(this, _currentItem);
 
-		internal static DependencyObject GetContainer(FrameworkElement frameworkElement, object item)
+	    internal static DependencyObject GetContainer(FrameworkElement frameworkElement, object item)
 		{
 			if (item is MenuItemSeparator)
 				return new Separator { Style = (Style)frameworkElement.FindResource(SeparatorStyleKey) };

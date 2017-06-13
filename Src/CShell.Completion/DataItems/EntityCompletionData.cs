@@ -15,18 +15,15 @@ namespace CShell.Completion.DataItems
 {
     class EntityCompletionData : CompletionData, IEntityCompletionData
     {
-        readonly IEntity entity;
-        static readonly CSharpAmbience csharpAmbience = new CSharpAmbience();
+        readonly IEntity _entity;
+        static readonly CSharpAmbience CsharpAmbience = new CSharpAmbience();
 
-        public IEntity Entity
-        {
-            get { return entity; }
-        }
+        public IEntity Entity => _entity;
 
         public EntityCompletionData(IEntity entity)
         {
-            if (entity == null) throw new ArgumentNullException("entity");
-            this.entity = entity;
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            this._entity = entity;
             IAmbience ambience = new CSharpAmbience();
             ambience.ConversionFlags = entity is ITypeDefinition ? ConversionFlags.ShowTypeParameterList : ConversionFlags.None;
             DisplayText = entity.Name;
@@ -41,25 +38,25 @@ namespace CShell.Completion.DataItems
         }
 
         #region Description & Documentation
-        private string description;
+        private string _description;
         public override string Description
         {
             get
             {
-                if (description == null)
+                if (_description == null)
                 {
-                    description = GetText(Entity);
+                    _description = GetText(Entity);
                     if (HasOverloads)
                     {
-                        description += " (+" + OverloadedData.Count() + " overloads)";
+                        _description += " (+" + OverloadedData.Count() + " overloads)";
                     }
-                    description += Environment.NewLine + XmlDocumentationToText(Entity.Documentation);
+                    _description += Environment.NewLine + XmlDocumentationToText(Entity.Documentation);
                 }
-                return description;
+                return _description;
             }
             set
             {
-                description = value;
+                _description = value;
             }
         }
 
@@ -70,7 +67,7 @@ namespace CShell.Completion.DataItems
         /// </summary>
         static string GetText(IEntity entity)
         {
-            IAmbience ambience = csharpAmbience;
+            IAmbience ambience = CsharpAmbience;
             ambience.ConversionFlags = ConversionFlags.StandardConversionFlags;
             if (entity is ITypeDefinition)
             {

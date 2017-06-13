@@ -20,14 +20,14 @@ namespace CShell.Completion.DataItems
     /// </summary>
     internal class OverrideCompletionData : EntityCompletionData
     {
-        readonly int declarationBegin;
-        readonly CSharpTypeResolveContext contextAtCaret;
+        readonly int _declarationBegin;
+        readonly CSharpTypeResolveContext _contextAtCaret;
 
         public OverrideCompletionData(int declarationBegin, IMember m, CSharpTypeResolveContext contextAtCaret)
             : base(m)
         {
-            this.declarationBegin = declarationBegin;
-            this.contextAtCaret = contextAtCaret;
+            this._declarationBegin = declarationBegin;
+            this._contextAtCaret = contextAtCaret;
             var ambience = new CSharpAmbience();
             ambience.ConversionFlags = ConversionFlags.ShowTypeParameterList | ConversionFlags.ShowParameterList | ConversionFlags.ShowParameterNames;
             this.CompletionText = ambience.ConvertEntity(m);
@@ -35,14 +35,14 @@ namespace CShell.Completion.DataItems
 
         #region Complete Override
         //TODO: this is never called, on completion
-        public void XXXComplete(ICSharpCode.AvalonEdit.Editing.TextArea textArea, ICSharpCode.AvalonEdit.Document.ISegment completionSegment, EventArgs insertionRequestEventArgs)
+        public void XxxComplete(ICSharpCode.AvalonEdit.Editing.TextArea textArea, ICSharpCode.AvalonEdit.Document.ISegment completionSegment, EventArgs insertionRequestEventArgs)
         {
-            if (declarationBegin > completionSegment.Offset)
+            if (_declarationBegin > completionSegment.Offset)
             {
                 base.Complete(textArea, completionSegment, insertionRequestEventArgs);
                 return;
             }
-            TypeSystemAstBuilder b = new TypeSystemAstBuilder(new CSharpResolver(contextAtCaret));
+            TypeSystemAstBuilder b = new TypeSystemAstBuilder(new CSharpResolver(_contextAtCaret));
             b.ShowTypeParameterConstraints = false;
             b.GenerateBody = true;
 
@@ -91,12 +91,12 @@ namespace CShell.Completion.DataItems
             var segmentDict = SegmentTrackingOutputFormatter.WriteNode(w, entityDeclaration, formattingOptions, textArea.Options);
 
             string newText = w.ToString().TrimEnd();
-            document.Replace(declarationBegin, completionSegment.EndOffset - declarationBegin, newText);
+            document.Replace(_declarationBegin, completionSegment.EndOffset - _declarationBegin, newText);
             var throwStatement = entityDeclaration.Descendants.FirstOrDefault(n => n is ThrowStatement);
             if (throwStatement != null)
             {
                 var segment = segmentDict[throwStatement];
-                textArea.Selection = new RectangleSelection(textArea, new TextViewPosition(textArea.Document.GetLocation(declarationBegin + segment.Offset)), new TextViewPosition(textArea.Document.GetLocation(declarationBegin + segment.Offset + segment.Length)));
+                textArea.Selection = new RectangleSelection(textArea, new TextViewPosition(textArea.Document.GetLocation(_declarationBegin + segment.Offset)), new TextViewPosition(textArea.Document.GetLocation(_declarationBegin + segment.Offset + segment.Length)));
             }
 
             //format the inserted code nicely

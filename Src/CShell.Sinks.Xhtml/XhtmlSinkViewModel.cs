@@ -10,11 +10,11 @@ namespace CShell.Sinks.Xhtml
 {
     public class XhtmlSinkViewModel : Framework.Sink
     {
-        private StringBuilder stringBuilder;
-        private StringWriter stringWriter;
-        private XhtmlDumper.XhtmlDumper xhtmlDumper;
+        private StringBuilder _stringBuilder;
+        private StringWriter _stringWriter;
+        private XhtmlDumper.XhtmlDumper _xhtmlDumper;
 
-        private TextWriter linqPadWriter;
+        private TextWriter _linqPadWriter;
         
         public XhtmlSinkViewModel(Uri uri)
         {
@@ -22,44 +22,38 @@ namespace CShell.Sinks.Xhtml
             DisplayName = GetTitle(uri, "Dump");
         }
 
-        public override PaneLocation PreferredLocation
-        {
-            get { return PaneLocation.Right; }
-        }
+        public override PaneLocation PreferredLocation => PaneLocation.Right;
 
-        private string text = "";
-        public string Text
-        {
-            get { return text; }
-        }
+        private string _text = "";
+        public string Text => _text;
 
         public override void Dump(object o)
         {
-            if (xhtmlDumper == null)
+            if (_xhtmlDumper == null)
             {
-                stringBuilder = new StringBuilder();
-                stringWriter = new StringWriter(stringBuilder);
+                _stringBuilder = new StringBuilder();
+                _stringWriter = new StringWriter(_stringBuilder);
                 var renderers = IoC.GetAllInstances(typeof(IXhtmlRenderer)).Cast<IXhtmlRenderer>().ToList();
                 //add the basic rederer at the end
                 renderers.Add(new BasicXhtmlRenderer());
-                xhtmlDumper = new XhtmlDumper.XhtmlDumper(stringWriter);
+                _xhtmlDumper = new XhtmlDumper.XhtmlDumper(_stringWriter);
             }
 
-            xhtmlDumper.WriteObject(o, null, 3);
-            text = stringBuilder.ToString();
+            _xhtmlDumper.WriteObject(o, null, 3);
+            _text = _stringBuilder.ToString();
             //append the closing HTML closing tags to the string
-            text += Environment.NewLine + "</body></html>";
+            _text += Environment.NewLine + "</body></html>";
 
             NotifyOfPropertyChange(()=>Text);
         }
 
         public override void Clear()
         {
-            if(linqPadWriter != null)
-                linqPadWriter.Dispose();
-            linqPadWriter = null;
+            if(_linqPadWriter != null)
+                _linqPadWriter.Dispose();
+            _linqPadWriter = null;
 
-            text = String.Empty;
+            _text = string.Empty;
             NotifyOfPropertyChange(() => Text);
         }
 

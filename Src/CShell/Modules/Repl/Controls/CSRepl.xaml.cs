@@ -37,46 +37,43 @@ namespace CShell.Modules.Repl.Controls
     /// <summary>
     /// Interaction logic for CommandLineControl.xaml
     /// </summary>
-    public partial class CSRepl : UserControl, IReplOutput
+    public partial class CsRepl : UserControl, IReplOutput
     {
-        private CSReplTextEditor textEditor;
+        private CsReplTextEditor _textEditor;
 
-        private IReplScriptExecutor replExecutor;
-        private readonly CommandHistory commandHistory;
+        private IReplScriptExecutor _replExecutor;
+        private readonly CommandHistory _commandHistory;
 
-        private bool executingInternalCommand;
-        private string partialCommand = "";
-        private int evaluationsRunning;
-        private IVisualLineTransformer[] initialTransformers;
+        private bool _executingInternalCommand;
+        private string _partialCommand = "";
+        private int _evaluationsRunning;
+        private IVisualLineTransformer[] _initialTransformers;
 
-        CompletionWindow completionWindow;
-        OverloadInsightWindow insightWindow;
+        CompletionWindow _completionWindow;
+        OverloadInsightWindow _insightWindow;
 
-        public CSRepl()
+        public CsRepl()
         {
             InitializeComponent();
 
-            textEditor = new CSReplTextEditor();
-            textEditor.FontFamily = new FontFamily("Consolas");
+            _textEditor = new CsReplTextEditor {FontFamily = new FontFamily("Consolas")};
             var convertFrom = new FontSizeConverter().ConvertFrom("10pt");
-            if (convertFrom != null) textEditor.FontSize = (double)convertFrom;
-            textEditor.TextArea.PreviewKeyDown += TextAreaOnPreviewKeyDown;
-            textEditor.IsEnabled = false;
-            textEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C#");
-            textEditor.FileName = "repl.csx";
-            textEditor.Repl = this;
-            this.Content = textEditor;
+            if (convertFrom != null) _textEditor.FontSize = (double)convertFrom;
+            _textEditor.TextArea.PreviewKeyDown += TextAreaOnPreviewKeyDown;
+            _textEditor.IsEnabled = false;
+            _textEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C#");
+            _textEditor.FileName = "repl.csx";
+            _textEditor.Repl = this;
+            this.Content = _textEditor;
 
-            commandHistory = new CommandHistory();
+            _commandHistory = new CommandHistory();
 
             var errorStream = new ConsoleStream(TextType.Error, Write);
-            var errorWriter = new StreamWriter(errorStream);
-            errorWriter.AutoFlush = true;
+            var errorWriter = new StreamWriter(errorStream) {AutoFlush = true};
             Console.SetError(errorWriter);
 
             var stdoutStream = new ConsoleStream(TextType.Output, Write);
-            var stdoutWriter = new StreamWriter(stdoutStream);
-            stdoutWriter.AutoFlush = true;
+            var stdoutWriter = new StreamWriter(stdoutStream) {AutoFlush = true};
             Console.SetOut(stdoutWriter);
 
             ShowConsoleOutput = true;
@@ -87,38 +84,38 @@ namespace CShell.Modules.Repl.Controls
 
             //clears the console and prints the headers
             // when clearing the initial transormers are removed too but we want to keep them
-            initialTransformers = textEditor.TextArea.TextView.LineTransformers.ToArray();
+            _initialTransformers = _textEditor.TextArea.TextView.LineTransformers.ToArray();
             Clear();
         }
 
-        internal IReplScriptExecutor ReplExecutor { get { return replExecutor; } }
+        internal IReplScriptExecutor ReplExecutor => _replExecutor;
 
         #region IReplOutput Interface Implementation (key parts)
         public void Initialize(IReplScriptExecutor replExecutor)
         {
             //unhook old executor
-            this.replExecutor = replExecutor;
-            this.textEditor.Completion = replExecutor.ReplCompletion;
+            this._replExecutor = replExecutor;
+            this._textEditor.Completion = replExecutor.ReplCompletion;
             Clear();
-            textEditor.IsEnabled = true;
+            _textEditor.IsEnabled = true;
         }
 
-        private string currrentInput;
-        private string currentSourceFile;
+        private string _currrentInput;
+        private string _currentSourceFile;
 
         public void EvaluateStarted(string input, string sourceFile)
         {
-            currrentInput = input;
-            currentSourceFile = sourceFile;
+            _currrentInput = input;
+            _currentSourceFile = sourceFile;
 
-            if (!executingInternalCommand)
+            if (!_executingInternalCommand)
             {
                 if (!IsEvaluating)
                 {
                     ClearLine();
                     WriteLine();
                 }
-                evaluationsRunning++;
+                _evaluationsRunning++;
                 var source = sourceFile != null ? System.IO.Path.GetFileName(sourceFile) : "unknown source";
                 WriteLine("[Evaluating external code (" + source + ")]", TextType.Repl);
             }
@@ -128,67 +125,61 @@ namespace CShell.Modules.Repl.Controls
         {
             if (!result.IsCompleteSubmission)
             {
-                partialCommand = currrentInput;
-                prompt = promptIncomplete;
+                _partialCommand = _currrentInput;
+                _prompt = _promptIncomplete;
             }
             else
             {
-                partialCommand = "";
-                prompt = promptComplete;
+                _partialCommand = "";
+                _prompt = _promptComplete;
             }
 
             if (result.HasErrors())
             {
-                WriteLine(String.Join(Environment.NewLine, result.GetMessages()), TextType.Error);
+                WriteLine(string.Join(Environment.NewLine, result.GetMessages()), TextType.Error);
             }
             if (result.HasWarnings())
             {
                 var msgs = result.GetMessages();
                 var warnings = FilterWarnings(msgs).ToList();
                 if (warnings.Any())
-                    WriteLine(String.Join(Environment.NewLine, warnings), TextType.Warning);
+                    WriteLine(string.Join(Environment.NewLine, warnings), TextType.Warning);
             }
 
             if (result.ReturnValue != null)
                 WriteLine(ToPrettyString(result.ReturnValue));
 
-            executingInternalCommand = false;
-            evaluationsRunning--;
+            _executingInternalCommand = false;
+            _evaluationsRunning--;
             if (!IsEvaluating)
             {
                 WritePrompt();
             }
         }
 
-        public bool IsEvaluating
-        {
-            get { return evaluationsRunning > 0; }
-        }
+        public bool IsEvaluating => _evaluationsRunning > 0;
 
-        private readonly HashSet<string> suppressedWarnings = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        public IEnumerable<string> SuppressedWarnings
-        {
-            get { return suppressedWarnings; }
-        }
+        private readonly HashSet<string> _suppressedWarnings = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        public IEnumerable<string> SuppressedWarnings => _suppressedWarnings;
 
         public void SuppressWarning(string warningCode)
         {
             if(string.IsNullOrEmpty(warningCode))
                 return;
-            if (!suppressedWarnings.Contains(warningCode))
-                suppressedWarnings.Add(warningCode);
+            if (!_suppressedWarnings.Contains(warningCode))
+                _suppressedWarnings.Add(warningCode);
         }
         public void ShowWarning(string warningCode)
         {
             if (string.IsNullOrEmpty(warningCode))
                 return;
-            if (suppressedWarnings.Contains(warningCode))
-                suppressedWarnings.Remove(warningCode);
+            if (_suppressedWarnings.Contains(warningCode))
+                _suppressedWarnings.Remove(warningCode);
         }
 
         private IEnumerable<string> FilterWarnings(IEnumerable<string> warnings)
         {
-            return warnings.Where(warning => !suppressedWarnings.Contains(GetWarningCode(warning)));
+            return warnings.Where(warning => !_suppressedWarnings.Contains(GetWarningCode(warning)));
         }
 
         private string GetWarningCode(string warning)
@@ -211,16 +202,16 @@ namespace CShell.Modules.Repl.Controls
 
         public void Clear()
         {
-            textEditor.Text = String.Empty;
+            _textEditor.Text = string.Empty;
             //so that the previous code highligting is cleared too
-            textEditor.TextArea.TextView.LineTransformers.Clear();
-            foreach (var visualLineTransformer in initialTransformers)
-                textEditor.TextArea.TextView.LineTransformers.Add(visualLineTransformer);
+            _textEditor.TextArea.TextView.LineTransformers.Clear();
+            foreach (var visualLineTransformer in _initialTransformers)
+                _textEditor.TextArea.TextView.LineTransformers.Add(visualLineTransformer);
 
 
             WriteLine("CShell REPL (" + Assembly.GetExecutingAssembly().GetName().Version + ")", TextType.Repl);
 
-            if (replExecutor != null)
+            if (_replExecutor != null)
             {
                 WriteLine("Enter C# code to be evaluated or enter \":help\" for more information.", TextType.Repl);
                 WritePrompt();
@@ -241,33 +232,33 @@ namespace CShell.Modules.Repl.Controls
         {
             Debug.WriteLine("Command: " + command);
 
-            if(replExecutor == null)
+            if(_replExecutor == null)
                 throw new InvalidOperationException("Repl executor cannot be null when entering commands.");
             WriteLine();
-            commandHistory.Add(command);
-            executingInternalCommand = true;
-            evaluationsRunning++;
-            var input = partialCommand + Environment.NewLine + command;
+            _commandHistory.Add(command);
+            _executingInternalCommand = true;
+            _evaluationsRunning++;
+            var input = _partialCommand + Environment.NewLine + command;
             input = input.Trim();
             //todo: call execute ASYNC
-            Task.Run(()=>replExecutor.Execute(input));
+            Task.Run(()=>_replExecutor.Execute(input));
         }
 
         private void ShowPreviousCommand()
         {
-            if(commandHistory.DoesPreviousCommandExist())
+            if(_commandHistory.DoesPreviousCommandExist())
             {
                 ClearLine();
-                Write(commandHistory.GetPreviousCommand(), TextType.None);
+                Write(_commandHistory.GetPreviousCommand(), TextType.None);
             }
         }
 
         private void ShowNextCommand()
         {
-            if (commandHistory.DoesNextCommandExist())
+            if (_commandHistory.DoesNextCommandExist())
             {
                 ClearLine();
-                Write(commandHistory.GetNextCommand(), TextType.None);
+                Write(_commandHistory.GetNextCommand(), TextType.None);
             }
         }
         #endregion
@@ -285,7 +276,7 @@ namespace CShell.Modules.Repl.Controls
                 if (IsEvaluating)
                 {
                     WriteLine("[Interrupting]", TextType.Repl);
-                    replExecutor.Terminate();//TODO: is this the right method?
+                    _replExecutor.Terminate();//TODO: is this the right method?
                 }
                 return;
             }
@@ -328,24 +319,24 @@ namespace CShell.Modules.Repl.Controls
             {
                 if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
                 {
-                    if (textEditor.CaretOffset >= PromptOffset)
+                    if (_textEditor.CaretOffset >= PromptOffset)
                     {
-                        if (textEditor.CaretOffset > textEditor.SelectionStart)
+                        if (_textEditor.CaretOffset > _textEditor.SelectionStart)
                         {
                             // Caret is after selection start - extend selection to end of line.
-                            textEditor.SelectionLength = Doc.TextLength - textEditor.SelectionStart;
+                            _textEditor.SelectionLength = Doc.TextLength - _textEditor.SelectionStart;
                         }
                         else
                         {
                             // Caret is at selection start (or no selection has been made) - select
                             // from end of current selection (if any) to end of line (if there's anything
                             // left on the line to select).
-                            int selLen = textEditor.SelectionLength;
-                            textEditor.SelectionLength = 0;
-                            if (textEditor.SelectionStart + selLen < Doc.TextLength)
+                            int selLen = _textEditor.SelectionLength;
+                            _textEditor.SelectionLength = 0;
+                            if (_textEditor.SelectionStart + selLen < Doc.TextLength)
                             { 
-                                textEditor.SelectionStart = textEditor.SelectionStart + selLen;
-                                textEditor.SelectionLength = Doc.TextLength - textEditor.SelectionStart;
+                                _textEditor.SelectionStart = _textEditor.SelectionStart + selLen;
+                                _textEditor.SelectionLength = Doc.TextLength - _textEditor.SelectionStart;
                             }
                         }
                     }
@@ -355,7 +346,7 @@ namespace CShell.Modules.Repl.Controls
                     // For some reason the selection isn't cleared when the user presses the end key and
                     // the whole line is selected. It works when the selection length is less than the
                     // length of the line though... Workaround:
-                    textEditor.SelectionLength = 0;
+                    _textEditor.SelectionLength = 0;
                 }
                 MoveCaretToEnd();
                 keyEventArgs.Handled = true;
@@ -365,22 +356,22 @@ namespace CShell.Modules.Repl.Controls
             {
                 if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
                 {
-                    if (textEditor.CaretOffset > PromptOffset)
+                    if (_textEditor.CaretOffset > PromptOffset)
                     {
-                        if (textEditor.CaretOffset == textEditor.SelectionStart)
+                        if (_textEditor.CaretOffset == _textEditor.SelectionStart)
                         {
                             // Caret is at selection start (or no selection has been made) - select/extend to start of line.
-                            int selLen = textEditor.SelectionStart - PromptOffset + textEditor.SelectionLength;
-                            textEditor.SelectionStart = PromptOffset;
-                            textEditor.SelectionLength = selLen;
+                            int selLen = _textEditor.SelectionStart - PromptOffset + _textEditor.SelectionLength;
+                            _textEditor.SelectionStart = PromptOffset;
+                            _textEditor.SelectionLength = selLen;
                         }
                         else
                         {
                             // Caret is after selection start - select from start of line to 
                             // beginning of current selection.
-                            int selLen = textEditor.SelectionStart - PromptOffset;
-                            textEditor.SelectionStart = PromptOffset;
-                            textEditor.SelectionLength = selLen;
+                            int selLen = _textEditor.SelectionStart - PromptOffset;
+                            _textEditor.SelectionStart = PromptOffset;
+                            _textEditor.SelectionLength = selLen;
                         }
                     }
                 }
@@ -389,7 +380,7 @@ namespace CShell.Modules.Repl.Controls
                     // For some reason the selection isn't cleared when the user presses the home key and
                     // the whole line is selected. It works when the selection length is less than the
                     // length of the line though... Workaround:
-                    textEditor.SelectionLength = 0;
+                    _textEditor.SelectionLength = 0;
                 }
                 MoveCaretToAfterPrompt();
                 keyEventArgs.Handled = true;
@@ -411,7 +402,7 @@ namespace CShell.Modules.Repl.Controls
                 if ((Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.X)) ||
                     (Keyboard.IsKeyDown(Key.RightCtrl) && Keyboard.IsKeyDown(Key.X)))
                 {
-                    if (textEditor.SelectionLength == 0)
+                    if (_textEditor.SelectionLength == 0)
                         SelectCurrentLine();
                     if (IsCaretAtPrompt())
                         keyEventArgs.Handled = true;
@@ -423,50 +414,44 @@ namespace CShell.Modules.Repl.Controls
         {
             var lineText = GetCurrentLineText();
             var line = Doc.GetLineByOffset(Offset);
-            offset = Offset - line.Offset - prompt.Length;
+            offset = Offset - line.Offset - _prompt.Length;
 
-            var vars = String.Join(Environment.NewLine, ReplExecutor.GetVariables().Select(v => v + ";"));
+            var vars = string.Join(Environment.NewLine, ReplExecutor.GetVariables().Select(v => v + ";"));
             var code = vars + lineText;
             offset += vars.Length;
-            var doc = new ReadOnlyDocument(new ICSharpCode.NRefactory.Editor.StringTextSource(code), textEditor.FileName);
+            var doc = new ReadOnlyDocument(new ICSharpCode.NRefactory.Editor.StringTextSource(code), _textEditor.FileName);
             return doc;
         }
         #endregion
 
         #region TextEditor Helpers
-        private string promptComplete = " > ";
-        private string promptIncomplete = "   ";
-        private string prompt = " > ";
-        private TextDocument Doc
-        {
-            get { return textEditor.Document; }
-        }
+        private string _promptComplete = " > ";
+        private string _promptIncomplete = "   ";
+        private string _prompt = " > ";
+        private TextDocument Doc => _textEditor.Document;
 
-        private int Offset
-        {
-            get { return textEditor.CaretOffset; }
-        }
+        private int Offset => _textEditor.CaretOffset;
 
         private int PromptOffset
         {
             get
             {
                 var lastLine = Doc.GetLineByNumber(Doc.LineCount);
-                return lastLine.Offset + prompt.Length;
+                return lastLine.Offset + _prompt.Length;
             }
         }
 
         private void MoveCaretToEnd()
         {
-            textEditor.CaretOffset = Doc.TextLength;
-            textEditor.ScrollToEnd(); 
+            _textEditor.CaretOffset = Doc.TextLength;
+            _textEditor.ScrollToEnd(); 
         }
 
         private void MoveCaretToAfterPrompt()
         {
             var lastLine = Doc.GetLineByNumber(Doc.LineCount);
-            var offsetAfterPrompt = lastLine.Offset + prompt.Length;
-            textEditor.CaretOffset = offsetAfterPrompt;
+            var offsetAfterPrompt = lastLine.Offset + _prompt.Length;
+            _textEditor.CaretOffset = offsetAfterPrompt;
         }
 
         private bool IsCaretAtCurrentLine()
@@ -478,46 +463,40 @@ namespace CShell.Modules.Repl.Controls
         private bool IsCaretAfterPrompt()
         {
             var offsetColumn = Doc.GetLocation(Offset).Column;
-            return offsetColumn > prompt.Length;
+            return offsetColumn > _prompt.Length;
         }
 
         private bool IsCaretAtPrompt()
         {
             var offsetColumn = Doc.GetLocation(Offset).Column;
-            return offsetColumn-1 == prompt.Length;
+            return offsetColumn-1 == _prompt.Length;
         }
 
-        private bool IsCaretAtWritablePosition()
-        {
-            return IsCaretAtCurrentLine() && IsCaretAfterPrompt();
-        }
+        private bool IsCaretAtWritablePosition() => IsCaretAtCurrentLine() && IsCaretAfterPrompt();
 
-        private bool IsSelectionBeforePrompOffset()
-        {
-            return textEditor.SelectionLength > 0 && textEditor.SelectionStart < PromptOffset;
-        }
+        private bool IsSelectionBeforePrompOffset() => _textEditor.SelectionLength > 0 && _textEditor.SelectionStart < PromptOffset;
 
         private void SelectCurrentLineOnly()
         {
-            var oldSelectionStart = textEditor.SelectionStart;
-            var oldSelectionEnd = oldSelectionStart + textEditor.SelectionLength;
-            textEditor.SelectionLength = 0;
-            textEditor.SelectionStart = PromptOffset;
-            textEditor.SelectionLength = oldSelectionEnd - PromptOffset;
+            var oldSelectionStart = _textEditor.SelectionStart;
+            var oldSelectionEnd = oldSelectionStart + _textEditor.SelectionLength;
+            _textEditor.SelectionLength = 0;
+            _textEditor.SelectionStart = PromptOffset;
+            _textEditor.SelectionLength = oldSelectionEnd - PromptOffset;
         }
 
         private void SelectCurrentLine()
         {
-            textEditor.SelectionStart = PromptOffset;
-            textEditor.SelectionLength = Doc.TextLength - PromptOffset;
+            _textEditor.SelectionStart = PromptOffset;
+            _textEditor.SelectionLength = Doc.TextLength - PromptOffset;
         }
 
         private string GetCurrentLineText()
         {
             var lastLine = Doc.GetLineByNumber(Doc.LineCount);
             var lastLineText = Doc.GetText(lastLine.Offset, lastLine.Length);
-            if (lastLineText.Length >= prompt.Length)
-                return lastLineText.Substring(prompt.Length);
+            if (lastLineText.Length >= _prompt.Length)
+                return lastLineText.Substring(_prompt.Length);
             else
                 return lastLineText;
         }
@@ -528,27 +507,21 @@ namespace CShell.Modules.Repl.Controls
         {
             var lastLine = Doc.GetLineByNumber(Doc.LineCount);
             Doc.Remove(lastLine.Offset, lastLine.Length);
-            Doc.Insert(Doc.TextLength, prompt);
+            Doc.Insert(Doc.TextLength, _prompt);
             MoveCaretToEnd();
         }
 
         public void WritePrompt()
         {
             //see if the last character is a new line, if not inser a new line
-            if (!textEditor.Text.EndsWith(Environment.NewLine))
+            if (!_textEditor.Text.EndsWith(Environment.NewLine))
                 WriteLine();
-            Write(prompt, TextType.None);
+            Write(_prompt, TextType.None);
         }
 
-        public void Write(string format, params object[] arg)
-        {
-            Write(String.Format(format, arg));
-        }
+        public void Write(string format, params object[] arg) => Write(string.Format(format, arg));
 
-        public void Write(string text)
-        {
-            Write(text, TextType.Output);
-        }
+        public void Write(string text) => Write(text, TextType.Output);
 
         public void Write(string text, TextType textType)
         {
@@ -560,33 +533,21 @@ namespace CShell.Modules.Repl.Controls
             if (textType != TextType.None)
             {
                 var colorizer = new OffsetColorizer(GetColor(textType)) { StartOffset = startOffset, EndOffset = endOffset };
-                textEditor.TextArea.TextView.LineTransformers.Add(colorizer);
+                _textEditor.TextArea.TextView.LineTransformers.Add(colorizer);
             }
         }
 
-        public void WriteLine()
-        {
-            Write(Environment.NewLine, TextType.None);
-        }
+        public void WriteLine() => Write(Environment.NewLine, TextType.None);
 
-        public void WriteLine(string format, params object[] arg)
-        {
-            Write(String.Format(format, arg) + Environment.NewLine);
-        }
+        public void WriteLine(string format, params object[] arg) => Write(string.Format(format, arg) + Environment.NewLine);
 
-        public void WriteLine(string text)
-        {
-            Write(text + Environment.NewLine);
-        }
+        public void WriteLine(string text) => Write(text + Environment.NewLine);
 
-        public void WriteLine(string text, TextType textType)
-        {
-            Write(text + Environment.NewLine, textType);
-        }
+        public void WriteLine(string text, TextType textType) => Write(text + Environment.NewLine, textType);
 
         private string ToPrettyString(object o)
         {
-            if (o is String)
+            if (o is string)
                 return o.ToString();
 
             var enumerable = o as IEnumerable;
@@ -596,7 +557,7 @@ namespace CShell.Modules.Repl.Controls
                 var firstItems = items.Take(20).ToList();
                 var sb = new StringBuilder();
                 sb.Append("{");
-                sb.Append(String.Join(", ", firstItems));
+                sb.Append(string.Join(", ", firstItems));
                 if (items.Count > firstItems.Count)
                     sb.Append("...");
                 sb.Append("}");
@@ -635,26 +596,26 @@ namespace CShell.Modules.Repl.Controls
 
         public string Font
         {
-            get { return textEditor.FontFamily.ToString(); }
-            set { textEditor.FontFamily = new FontFamily(value); }
+            get { return _textEditor.FontFamily.ToString(); }
+            set { _textEditor.FontFamily = new FontFamily(value); }
         }
 
         public new double FontSize
         {
-            get { return textEditor.FontSize; }
-            set { textEditor.FontSize = value; }
+            get { return _textEditor.FontSize; }
+            set { _textEditor.FontSize = value; }
         }
 
         public Color BackgroundColor
         {
             get
             {
-                var b = textEditor.Background as SolidColorBrush;
+                var b = _textEditor.Background as SolidColorBrush;
                 if (b != null) return b.Color;
                 else
                     return Colors.Black;
             }
-            set { textEditor.Background = new SolidColorBrush(value); }
+            set { _textEditor.Background = new SolidColorBrush(value); }
         }
 
         public Color ResultColor { get; set; }

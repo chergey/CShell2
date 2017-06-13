@@ -13,8 +13,8 @@ namespace CShell.Completion.DataItems
     /// </summary>
     class ImportCompletionData : EntityCompletionData
     {
-        string insertUsing;
-        string insertionText;
+        string _insertUsing;
+        string _insertionText;
 
         public ImportCompletionData(ITypeDefinition typeDef, CSharpTypeResolveContext contextAtCaret, bool useFullName)
             : base(typeDef)
@@ -23,12 +23,12 @@ namespace CShell.Completion.DataItems
             if (useFullName)
             {
                 var astBuilder = new TypeSystemAstBuilder(new CSharpResolver(contextAtCaret));
-                insertionText = astBuilder.ConvertType(typeDef).GetText();
+                _insertionText = astBuilder.ConvertType(typeDef).GetText();
             }
             else
             {
-                insertionText = typeDef.Name;
-                insertUsing = typeDef.Namespace;
+                _insertionText = typeDef.Name;
+                _insertUsing = typeDef.Namespace;
             }
         }
     } //end class ImportCompletionData

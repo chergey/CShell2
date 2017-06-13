@@ -28,22 +28,16 @@ namespace CShell.Completion.DataItems
         public string CompletionText { get; set; }
         public DisplayFlags DisplayFlags { get; set; }
 
-        public bool HasOverloads
-        {
-            get { return overloadedData.Count > 0; }
-        }
+        public bool HasOverloads => _overloadedData.Count > 0;
 
-        readonly List<ICompletionData> overloadedData = new List<ICompletionData>();
-        public IEnumerable<ICompletionData> OverloadedData
-        {
-            get { return overloadedData; }
-        }
+        readonly List<ICompletionData> _overloadedData = new List<ICompletionData>();
+        public IEnumerable<ICompletionData> OverloadedData => _overloadedData;
 
         public void AddOverload(ICompletionData data)
         {
-            if (overloadedData.Count == 0)
-                overloadedData.Add(this);
-            overloadedData.Add(data);
+            if (_overloadedData.Count == 0)
+                _overloadedData.Add(this);
+            _overloadedData.Add(data);
         }
         #endregion
 
@@ -51,39 +45,25 @@ namespace CShell.Completion.DataItems
 
         public System.Windows.Media.ImageSource Image { get; set; }
 
-        public void Complete(TextArea textArea, ICSharpCode.AvalonEdit.Document.ISegment completionSegment, EventArgs insertionRequestEventArgs)
-        {
-            textArea.Document.Replace(completionSegment, this.CompletionText);
-        }
+        public void Complete(TextArea textArea, ICSharpCode.AvalonEdit.Document.ISegment completionSegment, EventArgs insertionRequestEventArgs) => textArea.Document.Replace(completionSegment, this.CompletionText);
 
-        public object Content
-        {
-            get { return DisplayText; }
-        }
+        public object Content => DisplayText;
 
-        object ICSharpCode.AvalonEdit.CodeCompletion.ICompletionData.Description
-        {
-            get { return this.Description; }
-        }
+        object ICSharpCode.AvalonEdit.CodeCompletion.ICompletionData.Description => this.Description;
 
-        private double priority = 1;
+        private double _priority = 1;
         public virtual double Priority
         {
-            get { return priority; }
-            set { priority = value; }
+            get { return _priority; }
+            set { _priority = value; }
         }
 
-        public string Text
-        {
-            get { return this.CompletionText; }
-        }
+        public string Text => this.CompletionText;
+
         #endregion
 
         #region Equals, ToString, GetHashCode...
-        public override string ToString()
-        {
-            return DisplayText;
-        }
+        public override string ToString() => DisplayText;
 
         public override bool Equals(object obj)
         {
@@ -91,10 +71,8 @@ namespace CShell.Completion.DataItems
             return other != null && DisplayText == other.DisplayText;
         }
 
-        public override int GetHashCode()
-        {
-            return DisplayText.GetHashCode();
-        }
+        public override int GetHashCode() => DisplayText.GetHashCode();
+
         #endregion
 
         

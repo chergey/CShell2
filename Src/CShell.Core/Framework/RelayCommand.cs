@@ -26,7 +26,7 @@ namespace CShell.Framework
 		public RelayCommand(Action<object> execute, Predicate<object> canExecute)
 		{
 			if (execute == null)
-				throw new ArgumentNullException("execute");
+				throw new ArgumentNullException(nameof(execute));
 
 			_execute = execute;
 			_canExecute = canExecute;
@@ -36,22 +36,16 @@ namespace CShell.Framework
 		#region ICommand Members
 
 		[DebuggerStepThrough]
-		public bool CanExecute(object parameter)
-		{
-			return _canExecute == null || _canExecute(parameter);
-		}
+		public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
 
-		public event EventHandler CanExecuteChanged
+	    public event EventHandler CanExecuteChanged
 		{
 			add { CommandManager.RequerySuggested += value; }
 			remove { CommandManager.RequerySuggested -= value; }
 		}
 
-		public void Execute(object parameter)
-		{
-			_execute(parameter);
-		}
+		public void Execute(object parameter) => _execute(parameter);
 
-		#endregion // ICommand Members
+	    #endregion // ICommand Members
 	}
 }

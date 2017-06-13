@@ -20,19 +20,19 @@ namespace CShell.Sinks.Xhtml
             var vm = e.NewValue as XhtmlSinkViewModel;
             if (vm != null)
             {
-                vm.PropertyChanged += VMOnPropertyChanged;
-                if(!String.IsNullOrEmpty(vm.Text))
-                    webBrowser.NavigateToString(vm.Text);
+                vm.PropertyChanged += VmOnPropertyChanged;
+                if(!string.IsNullOrEmpty(vm.Text))
+                    WebBrowser.NavigateToString(vm.Text);
             }
         }
 
-        private void VMOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+        private void VmOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
             if (propertyChangedEventArgs.PropertyName == "Text")
             {
                 var vm = sender as XhtmlSinkViewModel;
-                if (!String.IsNullOrEmpty(vm.Text))
-                    webBrowser.NavigateToString(vm.Text);
+                if (!string.IsNullOrEmpty(vm.Text))
+                    WebBrowser.NavigateToString(vm.Text);
             }
         }
     }

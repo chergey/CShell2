@@ -11,10 +11,7 @@ namespace CShell.Sinks.Charting
     [Export(typeof(ISinkProvider))]
     public class ChartSinkProvider : ISinkProvider
     {
-        public bool Handles(Uri uri)
-        {
-            return uri.Scheme == "sink" && uri.Host == "cshell";
-        }
+        public bool Handles(Uri uri) => uri.Scheme == "sink" && uri.Host == "cshell";
 
         /// <summary>
         /// Creates a CShell sink.

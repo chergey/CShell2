@@ -20,7 +20,7 @@ namespace CShell
             var path = Path.Combine(WorkspaceDirectory, Constants.LayoutFile);
             var settings = new XmlWriterSettings();
             settings.Indent = true;
-            var windowLocation = shell.GetWindowLocation();
+            var windowLocation = _shell.GetWindowLocation();
 
             var serializer = new XmlSerializer(typeof(WindowLocation));
             using (var xmlWriter = XmlWriter.Create(path, settings))
@@ -28,7 +28,7 @@ namespace CShell
                 xmlWriter.WriteStartDocument();
                 xmlWriter.WriteStartElement("CShellLayout");
                 serializer.Serialize(xmlWriter, windowLocation);
-                shell.SaveLayout(xmlWriter);
+                _shell.SaveLayout(xmlWriter);
                 xmlWriter.WriteEndElement();
             }
         }
@@ -47,9 +47,9 @@ namespace CShell
             {
                 xmlReader.ReadStartElement();
                 var windowLocation = (WindowLocation)serializer.Deserialize(xmlReader);
-                shell.RestoreWindowLocation(windowLocation);
+                _shell.RestoreWindowLocation(windowLocation);
 
-                shell.LoadLayout(xmlReader);
+                _shell.LoadLayout(xmlReader);
             }
         }
 

@@ -5,9 +5,6 @@ namespace CShell.Framework.Services
 {
 	public static class ExtensionMethods
 	{
-		public static string GetExecutingAssemblyName()
-		{
-			return Assembly.GetExecutingAssembly().GetAssemblyName();
-		}
+		public static string GetExecutingAssemblyName() => Assembly.GetExecutingAssembly().GetAssemblyName();
 	}
 }

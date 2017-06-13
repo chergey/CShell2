@@ -70,10 +70,7 @@ namespace CShell.Hosting.Package
             _logger.Info("Installed: " + packageName);
         }
 
-        private static SemanticVersion GetVersion(IPackageReference packageReference)
-        {
-            return packageReference.Version == EmptyVersion ? null : new SemanticVersion(packageReference.Version, packageReference.SpecialVersion);
-        }
+        private static SemanticVersion GetVersion(IPackageReference packageReference) => packageReference.Version == EmptyVersion ? null : new SemanticVersion(packageReference.Version, packageReference.SpecialVersion);
 
         public bool IsInstalled(IPackageReference packageReference, bool allowPreRelease = false)
         {

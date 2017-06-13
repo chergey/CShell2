@@ -14,9 +14,7 @@ namespace CShell.Hosting
 
     public class ReplScriptHostFactory : IScriptHostFactory
     {
-        public IScriptHost CreateScriptHost(IScriptPackManager scriptPackManager, string[] scriptArgs)
-        {
-            return new ReplScriptHost(scriptPackManager, new ScriptEnvironment(scriptArgs));
-        }
+        public IScriptHost CreateScriptHost(IScriptPackManager scriptPackManager, string[] scriptArgs) 
+            => new ReplScriptHost(scriptPackManager, new ScriptEnvironment(scriptArgs));
     }
 }

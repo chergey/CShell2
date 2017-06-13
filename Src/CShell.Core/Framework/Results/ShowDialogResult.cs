@@ -8,29 +8,29 @@ namespace CShell.Framework.Results
 {
     public class ShowDialogResult : ResultBase
     {
-        private readonly Type dialogViewModelType;
-        private object dialogViewModel;
+        private readonly Type _dialogViewModelType;
+        private object _dialogViewModel;
 
         public IDictionary<string, object> Settings { get; set; } 
 
         public ShowDialogResult(object dialogViewModel)
         {
-            this.dialogViewModel = dialogViewModel;
+            this._dialogViewModel = dialogViewModel;
         }
 
         public ShowDialogResult(Type dialogViewModelType)
         {
-            this.dialogViewModelType = dialogViewModelType;
+            this._dialogViewModelType = dialogViewModelType;
         }
 
         public override void Execute(CoroutineExecutionContext context)
         {
             var windowManager = IoC.Get<IWindowManager>();
-            if(dialogViewModel == null)
+            if(_dialogViewModel == null)
             {
-                dialogViewModel = IoC.GetInstance(dialogViewModelType, null);
+                _dialogViewModel = IoC.GetInstance(_dialogViewModelType, null);
             }
-            var result = windowManager.ShowDialog(dialogViewModel, settings:Settings);
+            var result = windowManager.ShowDialog(_dialogViewModel, settings:Settings);
             OnCompleted(null, result.HasValue && !result.Value);
         }
     }

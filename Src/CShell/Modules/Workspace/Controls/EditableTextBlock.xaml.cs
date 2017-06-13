@@ -23,7 +23,7 @@ namespace CShell.Modules.Workspace.Controls
 
         // We keep the old text when we go into editmode
         // in case the user aborts with the escape key
-        private string oldText;
+        private string _oldText;
 
         #endregion Member Variables
 
@@ -66,7 +66,7 @@ namespace CShell.Modules.Workspace.Controls
             {
                 if (IsEditable)
                 {
-                    if (value) oldText = Text;
+                    if (value) _oldText = Text;
                     SetValue(IsInEditModeProperty, value);
                 }
             }
@@ -94,10 +94,7 @@ namespace CShell.Modules.Workspace.Controls
             typeof(EditableTextBlock),
             new PropertyMetadata("{0}"));
 
-        public string FormattedText
-        {
-            get { return String.Format(TextFormat, Text); }
-        }
+        public string FormattedText => string.Format(TextFormat, Text);
 
         #endregion Properties
 
@@ -131,7 +128,7 @@ namespace CShell.Modules.Workspace.Controls
             else if (e.Key == Key.Escape)
             {
                 this.IsInEditMode = false;
-                Text = oldText;
+                Text = _oldText;
                 e.Handled = true;
             }
         }

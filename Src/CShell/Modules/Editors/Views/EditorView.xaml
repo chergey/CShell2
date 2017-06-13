@@ -8,7 +8,7 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <controls:CodeCompletionTextEditor
-            x:Name="textEditor"
+            x:Name="TextEditor"
             FontFamily="Consolas"
             SyntaxHighlighting="C#"
             FontSize="10pt" 

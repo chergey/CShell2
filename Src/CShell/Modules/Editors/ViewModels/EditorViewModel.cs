@@ -21,42 +21,39 @@ namespace CShell.Modules.Editors.ViewModels
 {
 	public class EditorViewModel : Document, ITextDocument
 	{
-	    private readonly CShell.Workspace workspace;
-	    private string originalText;
-		private string path;
-		private string fileName;
-		private bool isDirty;
-	    private CodeCompletionTextEditor textEditor;
-	    private EditorView editorView;
+	    private readonly CShell.Workspace _workspace;
+	    private string _originalText;
+		private string _path;
+		private string _fileName;
+		private bool _isDirty;
+	    private CodeCompletionTextEditor _textEditor;
+	    private EditorView _editorView;
 
-	    private string toAppend;
-	    private string toPrepend;
+	    private string _toAppend;
+	    private string _toPrepend;
 
         public EditorViewModel(CShell.Workspace workspace)
 	    {
-	        this.workspace = workspace;
+	        this._workspace = workspace;
 	    }
 
-	    public string File
-	    {
-            get { return path; }
-	    }
+	    public string File => _path;
 
-        public override Uri Uri { get; set; }
+	    public override Uri Uri { get; set; }
 
 		public override bool IsDirty
 		{
-			get { return isDirty; }
+			get { return _isDirty; }
             set
             {
-                if (value == isDirty)
+                if (value == _isDirty)
                     return;
 
-                isDirty = value;
-                if (isDirty)
-                    DisplayName = fileName + "*";
+                _isDirty = value;
+                if (_isDirty)
+                    DisplayName = _fileName + "*";
                 else
-                    DisplayName = fileName;
+                    DisplayName = _fileName;
                 NotifyOfPropertyChange(() => IsDirty);
                 NotifyOfPropertyChange(() => DisplayName);
             }
@@ -71,7 +68,7 @@ namespace CShell.Modules.Editors.ViewModels
                 return;
             }
 
-            Execute.OnUIThreadEx(() =>
+            Execute.OnUiThreadEx(() =>
             {
                 MessageBoxResult result = MessageBox.Show("Do you want to save this document before closing?" + Environment.NewLine + Uri.AbsolutePath, "Confirmation", MessageBoxButton.YesNoCancel);
                 if (result == MessageBoxResult.Yes)
@@ -95,46 +92,46 @@ namespace CShell.Modules.Editors.ViewModels
 		{
 		    this.Uri = uri;
 		    var decodedPath = Uri.UnescapeDataString(uri.AbsolutePath);
-			this.path = Path.GetFullPath(decodedPath);
-			fileName = Path.GetFileName(path);
-		    DisplayName = fileName;
+			this._path = Path.GetFullPath(decodedPath);
+			_fileName = Path.GetFileName(_path);
+		    DisplayName = _fileName;
 		}
 
 		protected override void OnViewLoaded(object view)
 		{
-            editorView = (EditorView)view;
-            textEditor = editorView.textEditor;
-            if(System.IO.File.Exists(path))
-                textEditor.OpenFile(path);
-            originalText = textEditor.Text;
+            _editorView = (EditorView)view;
+            _textEditor = _editorView.TextEditor;
+            if(System.IO.File.Exists(_path))
+                _textEditor.OpenFile(_path);
+            _originalText = _textEditor.Text;
 
-            textEditor.TextChanged += delegate
+            _textEditor.TextChanged += delegate
 			{
-                IsDirty = string.Compare(originalText, textEditor.Text) != 0;
+                IsDirty = string.Compare(_originalText, _textEditor.Text) != 0;
 			};
 
             //some other settings
-		    var extension = Path.GetExtension(path);
+		    var extension = Path.GetExtension(_path);
 		    extension = extension == null ? "" : extension.ToLower();
-		    textEditor.ShowLineNumbers = true;
-            textEditor.SyntaxHighlighting = GetHighlighting(extension);
+		    _textEditor.ShowLineNumbers = true;
+            _textEditor.SyntaxHighlighting = GetHighlighting(extension);
 
-		    if (workspace != null && workspace.ReplExecutor.DocumentCompletion != null && (extension == ".cs" || extension == ".csx"))
+		    if (_workspace != null && _workspace.ReplExecutor.DocumentCompletion != null && (extension == ".cs" || extension == ".csx"))
 		    {
-		        textEditor.Completion = workspace.ReplExecutor.DocumentCompletion;
-		        textEditor.ReplExecutor = workspace.ReplExecutor;
+		        _textEditor.Completion = _workspace.ReplExecutor.DocumentCompletion;
+		        _textEditor.ReplExecutor = _workspace.ReplExecutor;
 		    }
 
             //if any outstanding text needs to be appended, do it now
-		    if (toAppend != null)
+		    if (_toAppend != null)
 		    {
-		        Append(toAppend);
-		        toAppend = null;
+		        Append(_toAppend);
+		        _toAppend = null;
 		    }
-            if (toPrepend != null)
+            if (_toPrepend != null)
             {
-                Prepend(toPrepend);
-                toPrepend = null;
+                Prepend(_toPrepend);
+                _toPrepend = null;
             }
 
             //debug to see what commands are available in the editor
@@ -151,49 +148,49 @@ namespace CShell.Modules.Editors.ViewModels
 
         public override void Save()
         {
-            Execute.OnUIThreadEx(() =>
+            Execute.OnUiThreadEx(() =>
             {
-                textEditor.Save(path);
-                originalText = textEditor.Text;
+                _textEditor.Save(_path);
+                _originalText = _textEditor.Text;
                 IsDirty = false;
             });
         }
 
         public override void SaveAs(string newFile)
         {
-            Execute.OnUIThreadEx(() =>
+            Execute.OnUiThreadEx(() =>
             {
-                textEditor.Save(newFile);
-                this.path = newFile;
-                fileName = Path.GetFileName(newFile);
+                _textEditor.Save(newFile);
+                this._path = newFile;
+                _fileName = Path.GetFileName(newFile);
                 Uri = new Uri(System.IO.Path.GetFullPath(newFile));
 
-                originalText = textEditor.Text;
+                _originalText = _textEditor.Text;
                 IsDirty = false;
-                DisplayName = fileName;
+                DisplayName = _fileName;
                 NotifyOfPropertyChange(() => DisplayName);
             });
         }
 
         public string GetSelectionOrCurrentLine()
         {
-            var code = textEditor.SelectedText;
+            var code = _textEditor.SelectedText;
             int offsetLine;
-            var doc = textEditor.Document;
+            var doc = _textEditor.Document;
 
             // if there is no selection, just use the current line
             if (string.IsNullOrEmpty(code))
             {
-                offsetLine = doc.GetLocation(textEditor.CaretOffset).Line;
+                offsetLine = doc.GetLocation(_textEditor.CaretOffset).Line;
                 var line = doc.GetLineByNumber(offsetLine);
                 var lineText = doc.GetText(line.Offset, line.Length);
                 code = lineText;
             }
             else
-                offsetLine = doc.GetLocation(textEditor.SelectionStart + textEditor.SelectionLength).Line;
+                offsetLine = doc.GetLocation(_textEditor.SelectionStart + _textEditor.SelectionLength).Line;
 
-            textEditor.TextArea.Caret.Line = offsetLine + 1;
-            textEditor.ScrollToLine(offsetLine + 1);
+            _textEditor.TextArea.Caret.Line = offsetLine + 1;
+            _textEditor.ScrollToLine(offsetLine + 1);
             return code;
         }
 
@@ -235,80 +232,80 @@ namespace CShell.Modules.Editors.ViewModels
         #region ITextDocument
         public void Undo()
         {
-            Execute.OnUIThreadEx(()=>textEditor.Undo());
+            Execute.OnUiThreadEx(()=>_textEditor.Undo());
         }
 
         public void Redo()
         {
-            Execute.OnUIThreadEx(() => textEditor.Redo());
+            Execute.OnUiThreadEx(() => _textEditor.Redo());
         }
 
         public void Cut()
         {
-            Execute.OnUIThreadEx(() => textEditor.Cut());
+            Execute.OnUiThreadEx(() => _textEditor.Cut());
         }
 
         public void Copy()
         {
-            Execute.OnUIThreadEx(() => textEditor.Copy());
+            Execute.OnUiThreadEx(() => _textEditor.Copy());
         }
 
         public void Paste()
         {
-            Execute.OnUIThreadEx(() => textEditor.Paste());
+            Execute.OnUiThreadEx(() => _textEditor.Paste());
         }
 
         public void SelectAll()
         {
-            Execute.OnUIThreadEx(() => textEditor.SelectAll());
+            Execute.OnUiThreadEx(() => _textEditor.SelectAll());
         }
 
         public void Select(int start, int length)
         {
             start = Math.Abs(start);
             length = Math.Abs(length);
-            Execute.OnUIThreadEx(() =>
+            Execute.OnUiThreadEx(() =>
             {
-                if (start > textEditor.Document.TextLength)
-                    start = textEditor.Document.TextLength - 1;
-                if (start + length > textEditor.Document.TextLength)
-                    length = textEditor.Document.TextLength - start;
-                textEditor.Select(start, length);
+                if (start > _textEditor.Document.TextLength)
+                    start = _textEditor.Document.TextLength - 1;
+                if (start + length > _textEditor.Document.TextLength)
+                    length = _textEditor.Document.TextLength - start;
+                _textEditor.Select(start, length);
             });
         }
 
         public void Comment()
         {
-            Execute.OnUIThreadEx(() => editorView.Comment());
+            Execute.OnUiThreadEx(() => _editorView.Comment());
         }
 
         public void Uncomment()
         {
-            Execute.OnUIThreadEx(() => editorView.Uncomment());
+            Execute.OnUiThreadEx(() => _editorView.Uncomment());
         }
 
 	    public void Append(string text)
 	    {
             //if the text editor is available append right now, otherwise wait until later
-	        if (textEditor != null)
+	        if (_textEditor != null)
 	        {
 	            Text = Text + text;
 	        }
 	        else
 	        {
-	            toAppend += text;
+	            _toAppend += text;
 	        }
 	    }
 
 	    public void Prepend(string text)
 	    {
-            if (textEditor != null)
+            if (_textEditor != null)
             {
                 Text = text + Text;
             }
             else
             {
-                toPrepend += text;
+                _toPrepend += text;
             }
         }
 
@@ -316,23 +313,23 @@ namespace CShell.Modules.Editors.ViewModels
         {
             get
             {
-                if (textEditor == null)
+                if (_textEditor == null)
                     throw new NullReferenceException("textEditor is not ready");
                 var txt = "";
-                Execute.OnUIThreadEx(() => txt = textEditor.Text);
+                Execute.OnUiThreadEx(() => txt = _textEditor.Text);
                 return txt;
             }
             set
             {
-                if (textEditor == null)
+                if (_textEditor == null)
                     throw new NullReferenceException("textEditor is not ready");
-                Execute.OnUIThreadEx(() =>
+                Execute.OnUiThreadEx(() =>
                 {
                     if (value == null)
                         value = "";
-                    using(textEditor.Document.RunUpdate())
+                    using(_textEditor.Document.RunUpdate())
                     {
-                        textEditor.Document.Text = value;
+                        _textEditor.Document.Text = value;
                     }
                 });
             }

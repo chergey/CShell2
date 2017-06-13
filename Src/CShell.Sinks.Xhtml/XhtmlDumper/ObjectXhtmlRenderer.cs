@@ -16,7 +16,7 @@ namespace CShell.Sinks.Xhtml.XhtmlDumper
             // if it's an enumerable we render each object as a row in a table
             // if it's jut an object we render each property of the object as a row in a table
 
-            if(!String.IsNullOrWhiteSpace(description))
+            if(!string.IsNullOrWhiteSpace(description))
             {
                 writer.RenderBeginTag(HtmlTextWriterTag.H3);
                 writer.Write(description);
@@ -27,7 +27,7 @@ namespace CShell.Sinks.Xhtml.XhtmlDumper
             if (depth <= 0)
                 return true;
 
-            if (o is IEnumerable && !(o is String))
+            if (o is IEnumerable && !(o is string))
                 return RenderEnumerable((IEnumerable)o, depth, writer);
             else
                 return RenderObject(o, depth, writer);
@@ -271,14 +271,11 @@ namespace CShell.Sinks.Xhtml.XhtmlDumper
             return null;
         }
 
-        private static bool IsSimpleType(Type type)
-        {
-            return type.IsPrimitive ||
-                   type.IsValueType ||
-                   type == typeof(DateTime) ||
-                   type == typeof(DateTimeOffset) ||
-                   type == typeof(TimeSpan) ||
-                   type == typeof(string);
-        }
+        private static bool IsSimpleType(Type type) => type.IsPrimitive ||
+                                                       type.IsValueType ||
+                                                       type == typeof(DateTime) ||
+                                                       type == typeof(DateTimeOffset) ||
+                                                       type == typeof(TimeSpan) ||
+                                                       type == typeof(string);
     }
 }

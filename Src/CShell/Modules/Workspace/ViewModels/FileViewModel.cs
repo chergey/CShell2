@@ -28,25 +28,13 @@ namespace CShell.Modules.Workspace.ViewModels
             IsEditable = true;
         }
 
-        public FileInfo FileInfo
-        {
-            get { return fileInfo; }
-        }
+        public FileInfo FileInfo => fileInfo;
 
-        public virtual string ToolTip
-        {
-            get { return RelativePath; }
-        }
+        public virtual string ToolTip => RelativePath;
 
-        public string RelativePath
-        {
-            get { return PathHelper.ToRelativePath(Environment.CurrentDirectory, fileInfo.FullName); }
-        }
+        public string RelativePath => PathHelper.ToRelativePath(Environment.CurrentDirectory, fileInfo.FullName);
 
-        public string FileExtension
-        {
-            get { return fileInfo.Extension; }
-        }
+        public string FileExtension => fileInfo.Extension;
 
         public override Uri IconSource
         {
@@ -131,15 +119,8 @@ namespace CShell.Modules.Workspace.ViewModels
             }
         }
 
-        public bool CanAddFileReferences
-        {
-            get { return fileInfo.Extension.ToLower() == ".csx"; }
-        }
+        public bool CanAddFileReferences => fileInfo.Extension.ToLower() == ".csx";
 
-        public bool CanAddGacReferences
-        {
-            get { return fileInfo.Extension.ToLower() == ".csx"; }
-        }
-
+        public bool CanAddGacReferences => fileInfo.Extension.ToLower() == ".csx";
     }//end class
 }

@@ -24,15 +24,9 @@ namespace CShell.Hosting.ReplCommands
             _installationProvider = installationProvider;
         }
 
-        public string CommandName
-        {
-            get { return "install"; }
-        }
+        public string CommandName => "install";
 
-        public string Description
-        {
-            get { return "Installs a Nuget package. I.e. :install <package> <version> <\"pre\">"; }
-        }
+        public string Description => "Installs a Nuget package. I.e. :install <package> <version> <\"pre\">";
 
         public object Execute(IRepl repl, object[] args)
         {

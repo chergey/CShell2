@@ -11,10 +11,7 @@ namespace CShell.Sinks.Xhtml
     [Export(typeof(ISinkProvider))]
     public class XhtmlSinkProvider : ISinkProvider
     {
-        public bool Handles(Uri uri)
-        {
-            return uri.Scheme == "sink" && uri.Host == "cshell";
-        }
+        public bool Handles(Uri uri) => uri.Scheme == "sink" && uri.Host == "cshell";
 
         /// <summary>
         /// Creates a CShell sink.

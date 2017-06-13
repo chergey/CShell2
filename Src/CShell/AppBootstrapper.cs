@@ -38,8 +38,8 @@ namespace CShell
             Initialize();
         }
 
-        private CompositionContainer container;
-        private List<IModule> modules;
+        private CompositionContainer _container;
+        private List<IModule> _modules;
 
         /// <summary>
         /// By default, we are configured to use MEF
@@ -87,25 +87,25 @@ namespace CShell
             HostingHelpers.ConfigureHostingCatalog(aggregateCatalog);
 
             //setup the container
-            container = new CompositionContainer(aggregateCatalog);
+            _container = new CompositionContainer(aggregateCatalog);
             //add custom exports 
             var batch = new CompositionBatch();
             batch.AddExportedValue<IWindowManager>(new WindowManager());
             batch.AddExportedValue<IEventAggregator>(new EventAggregator());
-            batch.AddExportedValue(container);
-            container.Compose(batch);
+            batch.AddExportedValue(_container);
+            _container.Compose(batch);
 
             //use this for testing the MEF dependency resolution
             //HostingHelpers.TestIfAllExportsCanBeResolved(container);
 
             //configure the modules
-            modules = container.GetExportedValues<IModule>().ToList();
+            _modules = _container.GetExportedValues<IModule>().ToList();
           
             //order them
-            var orderedModules = modules.Where(m => m.Order > 0).ToList();
-            var unorderedModules = modules.Where(m => m.Order < 1).ToList();
-            modules = orderedModules.OrderBy(m => m.Order).Concat(unorderedModules).ToList();
-            foreach (var module in modules)
+            var orderedModules = _modules.Where(m => m.Order > 0).ToList();
+            var unorderedModules = _modules.Where(m => m.Order < 1).ToList();
+            _modules = orderedModules.OrderBy(m => m.Order).Concat(unorderedModules).ToList();
+            foreach (var module in _modules)
             {
                 module.Configure();
             }
@@ -123,7 +123,7 @@ namespace CShell
             //base.OnStartup(sender, e);
 
             //2. init all basic modules, they themselves will register in the UI
-            foreach (var module in modules)
+            foreach (var module in _modules)
                 module.Start();
 
             //3. & finally forward the arguments to the shell that it can open the workspace if one was specified in the arguments.
@@ -160,23 +160,19 @@ namespace CShell
         protected override object GetInstance(Type serviceType, string key)
         {
             string contract = string.IsNullOrEmpty(key) ? AttributedModelServices.GetContractName(serviceType) : key;
-            var exports = container.GetExportedValues<object>(contract);
-
+            var exports = _container.GetExportedValues<object>(contract);
+            var a = _container.Catalog.Parts.First();
+        
             if (exports.Any())
                 return exports.First();
 
             throw new Exception(string.Format("Could not locate any instances of contract {0}.", contract));
         }
 
-        protected override IEnumerable<object> GetAllInstances(Type serviceType)
-        {
-            return container.GetExportedValues<object>(AttributedModelServices.GetContractName(serviceType));
-        }
+        protected override IEnumerable<object> GetAllInstances(Type serviceType) => _container.GetExportedValues<object>(AttributedModelServices.GetContractName(serviceType));
 
-        protected override void BuildUp(object instance)
-        {
-            container.SatisfyImportsOnce(instance);
-        }
+        protected override void BuildUp(object instance) => _container.SatisfyImportsOnce(instance);
+
         #endregion
     }
 }

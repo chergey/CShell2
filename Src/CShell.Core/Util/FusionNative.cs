@@ -71,12 +71,12 @@ namespace CShell.Util
         // 19 = MVID, byte[16]*             ; MVID value from __AssemblyInfo__.ini - what's this?
         //
         [PreserveSig()]
-        int Set(uint PropertyId,
+        int Set(uint propertyId,
                 IntPtr pvProperty,
                 uint cbProperty);
 
         [PreserveSig()]
-        int Get(uint PropertyId,
+        int Get(uint propertyId,
                 IntPtr pvProperty,
                 ref uint pcbProperty);
 
@@ -89,7 +89,7 @@ namespace CShell.Util
                            uint dwDisplayFlags);
 
         [PreserveSig()]
-        int BindToObject(object refIID,
+        int BindToObject(object refIid,
                          object pAsmBindSink,
                          IApplicationContext pApplicationContext,
                          [MarshalAs(UnmanagedType.LPWStr)] string szCodeBase,
@@ -238,11 +238,11 @@ namespace CShell.Util
                                                 [MarshalAs(UnmanagedType.LPWStr)] StringBuilder wzDir,
                                                 ref uint pdwSize);
 
-        public static string GetGacPath(bool isCLRv4 = false)
+        public static string GetGacPath(bool isClRv4 = false)
         {
-            const uint ASM_CACHE_ROOT = 0x08; // CLR V2.0
-            const uint ASM_CACHE_ROOT_EX = 0x80; // CLR V4.0
-            uint flags = isCLRv4 ? ASM_CACHE_ROOT_EX : ASM_CACHE_ROOT;
+            const uint asmCacheRoot = 0x08; // CLR V2.0
+            const uint asmCacheRootEx = 0x80; // CLR V4.0
+            uint flags = isClRv4 ? asmCacheRootEx : asmCacheRoot;
 
             const int size = 260; // MAX_PATH
             StringBuilder b = new StringBuilder(size);

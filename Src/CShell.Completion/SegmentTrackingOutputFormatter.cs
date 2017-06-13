@@ -11,19 +11,16 @@ namespace CShell.Completion
     /// </summary>
     public class SegmentTrackingOutputFormatter : TextWriterTokenWriter
     {
-        Dictionary<AstNode, ICSharpCode.AvalonEdit.Document.ISegment> segments = new Dictionary<AstNode, ICSharpCode.AvalonEdit.Document.ISegment>();
-        Stack<int> startOffsets = new Stack<int>();
-        readonly StringWriter stringWriter;
+        Dictionary<AstNode, ICSharpCode.AvalonEdit.Document.ISegment> _segments = new Dictionary<AstNode, ICSharpCode.AvalonEdit.Document.ISegment>();
+        Stack<int> _startOffsets = new Stack<int>();
+        readonly StringWriter _stringWriter;
 
-        public IDictionary<AstNode, ICSharpCode.AvalonEdit.Document.ISegment> Segments
-        {
-            get { return segments; }
-        }
+        public IDictionary<AstNode, ICSharpCode.AvalonEdit.Document.ISegment> Segments => _segments;
 
         public SegmentTrackingOutputFormatter(StringWriter stringWriter)
             : base(stringWriter)
         {
-            this.stringWriter = stringWriter;
+            this._stringWriter = stringWriter;
         }
 
         public static IDictionary<AstNode, ICSharpCode.AvalonEdit.Document.ISegment> WriteNode(StringWriter writer, AstNode node, CSharpFormattingOptions policy, ICSharpCode.AvalonEdit.TextEditorOptions options)
@@ -38,17 +35,17 @@ namespace CShell.Completion
         public override void StartNode(AstNode node)
         {
             base.StartNode(node);
-            startOffsets.Push(stringWriter.GetStringBuilder().Length);
+            _startOffsets.Push(_stringWriter.GetStringBuilder().Length);
         }
 
         public override void EndNode(AstNode node)
         {
-            int startOffset = startOffsets.Pop();
-            StringBuilder b = stringWriter.GetStringBuilder();
+            int startOffset = _startOffsets.Pop();
+            StringBuilder b = _stringWriter.GetStringBuilder();
             int endOffset = b.Length;
             while (endOffset > 0 && b[endOffset - 1] == '\r' || b[endOffset - 1] == '\n')
                 endOffset--;
-            segments.Add(node, new TextSegment { StartOffset = startOffset, EndOffset = endOffset });
+            _segments.Add(node, new TextSegment { StartOffset = startOffset, EndOffset = endOffset });
             base.EndNode(node);
         }
     }

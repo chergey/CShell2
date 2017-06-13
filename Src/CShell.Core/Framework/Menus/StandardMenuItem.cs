@@ -23,32 +23,17 @@ namespace CShell.Framework.Menus
         public Image Icon { get; private set; }
         public Uri IconSource { get; private set; }
 
-		public string ActionText
-		{
-			get { return "Execute"; }
-		}
+		public string ActionText => "Execute";
 
-		public bool CanExecute
-		{
-			get { return _canExecute(); }
-		}
+	    public bool CanExecute => _canExecute();
 
-		public override string Name
-		{
-			get { return string.IsNullOrEmpty(Text) ? null : Text.Replace("_", string.Empty); }
-		}
+	    public override string Name => string.IsNullOrEmpty(Text) ? null : Text.Replace("_", string.Empty);
 
-		public string InputGestureText
-		{
-			get
-			{
-				return _keyGesture == null
-					? string.Empty
-					: _keyGesture.GetDisplayStringForCulture(CultureInfo.CurrentUICulture);
-			}
-		}
+	    public string InputGestureText => _keyGesture == null
+	        ? string.Empty
+	        : _keyGesture.GetDisplayStringForCulture(CultureInfo.CurrentUICulture);
 
-		public StandardMenuItem(string text)
+	    public StandardMenuItem(string text)
 		{
 			Text = text;
 		}
@@ -68,17 +53,11 @@ namespace CShell.Framework.Menus
 			return this;
 		}
 
-		public StandardMenuItem WithIcon()
-		{
-			return WithIcon(Assembly.GetCallingAssembly(), "Resources/Icons/" + Name.Replace(" ", string.Empty) + ".png");
-		}
+		public StandardMenuItem WithIcon() => WithIcon(Assembly.GetCallingAssembly(), "Resources/Icons/" + Name.Replace(" ", string.Empty) + ".png");
 
-		public StandardMenuItem WithIcon(string path)
-		{
-			return WithIcon(Assembly.GetCallingAssembly(), path);
-		}
+	    public StandardMenuItem WithIcon(string path) => WithIcon(Assembly.GetCallingAssembly(), path);
 
-		public StandardMenuItem WithIcon(Assembly source, string path)
+	    public StandardMenuItem WithIcon(Assembly source, string path)
 		{
 			var manager = IoC.Get<IResourceManager>();
 			var iconSource = manager.GetBitmap(path, source.GetAssemblyName());
@@ -96,10 +75,7 @@ namespace CShell.Framework.Menus
 			return this;
 		}
 
-        public StandardMenuItem WithActivator(IActivate activator)
-        {
-            return WithActivator(activator, false);
-        }
+        public StandardMenuItem WithActivator(IActivate activator) => WithActivator(activator, false);
 
 	    public StandardMenuItem WithActivator(IActivate activator, bool inverse)
         {

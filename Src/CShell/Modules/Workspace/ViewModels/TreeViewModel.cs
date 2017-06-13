@@ -8,70 +8,64 @@ namespace CShell.Modules.Workspace.ViewModels
 {
     public class TreeViewModel : PropertyChangedBase, IHaveDisplayName, IDisposable
     {
-        private string displayName;
+        private string _displayName;
         public virtual string DisplayName
         {
-            get { return displayName; }
+            get { return _displayName; }
             set
             {
                 //if while a rename ESC is pressed the DisplayName will be set to null 
                 if(value == null)
                     return;
-                displayName = value;
+                _displayName = value;
                 NotifyOfPropertyChange(() => DisplayName);
             }
         }
 
-        public virtual Uri IconSource
-        {
-            get { return new Uri("pack://application:,,,/CShell;component/Resources/Icons/page_white.png"); }
-        }
+        public virtual Uri IconSource => new Uri("pack://application:,,,/CShell;component/Resources/Icons/page_white.png");
 
-        private readonly IObservableCollection<TreeViewModel> children = new BindableCollection<TreeViewModel>();
-        public virtual IObservableCollection<TreeViewModel> Children
-        {
-            get { return children; }
-        }
+        private readonly IObservableCollection<TreeViewModel> _children = new BindableCollection<TreeViewModel>();
+        public virtual IObservableCollection<TreeViewModel> Children => _children;
 
-        private bool isSelected;
+        private bool _isSelected;
         public bool IsSelected
         {
-            get { return isSelected; }
-            set { isSelected = value; ; NotifyOfPropertyChange(() => IsSelected); }
+            get { return _isSelected; }
+            set { _isSelected = value; ; NotifyOfPropertyChange(() => IsSelected); }
         }
 
-        private bool isExpanded;
+        private bool _isExpanded;
         public bool IsExpanded
         {
-            get { return isExpanded; }
+            get { return _isExpanded; }
             set
             {
-                isExpanded = value;
+                _isExpanded = value;
                 NotifyOfPropertyChange(() => IsExpanded);
                 NotifyOfPropertyChange(() => IconSource);
             }
         }
 
-        private bool isEditable = true;
+        private bool _isEditable = true;
         public bool IsEditable
         {
-            get { return isEditable; }
+            get { return _isEditable; }
             set
             {
-                isEditable = value;
+                _isEditable = value;
                 NotifyOfPropertyChange(() => IsEditable);
             }
         }
 
-        private bool isInEditMode = false;
+        private bool _isInEditMode = false;
         public virtual bool IsInEditMode
         {
-            get { return isInEditMode; }
+            get { return _isInEditMode; }
             set
             {
-                var previousMode = isInEditMode;
-                isInEditMode = value;
-                if(previousMode == true && isInEditMode == false)
+                var previousMode = _isInEditMode;
+                _isInEditMode = value;
+                if(previousMode == true && _isInEditMode == false)
                     EditModeFinished();
                 NotifyOfPropertyChange(() => IsInEditMode);
             }
@@ -98,14 +92,11 @@ namespace CShell.Modules.Workspace.ViewModels
             }
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-        }
+        public void Dispose() => Dispose(true);
 
         protected virtual void Dispose(bool disposing)
         {
-            if (children != null)
+            if (_children != null)
             {
                 foreach (var child in Children)
                 {

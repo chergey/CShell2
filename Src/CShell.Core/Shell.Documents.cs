@@ -15,19 +15,13 @@ namespace CShell
         /// <summary>
         /// Gets all available documents including sinks.
         /// </summary>
-        public static IEnumerable<IDocument> GetDocs()
-        {
-            return UI.Documents.ToArray();
-        }
+        public static IEnumerable<IDocument> GetDocs() => Ui.Documents.ToArray();
 
         /// <summary>
         /// Gets or creates specific document and opens it.
         /// </summary>
         /// <param name="uri">The URI of the document. Can be a file path URI.</param>
-        public static IDocument GetDoc(Uri uri)
-        {
-            return GetDoc(uri, false);
-        }
+        public static IDocument GetDoc(Uri uri) => GetDoc(uri, false);
 
         /// <summary>
         /// Gets or creates specific document and opens it.
@@ -46,7 +40,7 @@ namespace CShell
                     .FirstOrDefault();
 
                 if (doc != null && !suppressOpen)
-                    UI.ActivateDocument(doc);
+                    Ui.ActivateDocument(doc);
             }
             return doc;
         }
@@ -54,10 +48,7 @@ namespace CShell
         /// <summary>
         /// Gets all available text documents.
         /// </summary>
-        public static IEnumerable<ITextDocument> GetTextDocs()
-        {
-            return UI.Documents.OfType<ITextDocument>().ToArray();
-        }
+        public static IEnumerable<ITextDocument> GetTextDocs() => Ui.Documents.OfType<ITextDocument>().ToArray();
 
         /// <summary>
         /// Gets or creates specific text document and opens it.
@@ -65,7 +56,7 @@ namespace CShell
         /// <param name="filePath">The path to the file. Can be relative to the root path of the workspace, e.g. "subfolder/file.csx"</param>
         public static ITextDocument GetTextDoc(string filePath)
         {
-            if (filePath == null) throw new ArgumentNullException("filePath");
+            if (filePath == null) throw new ArgumentNullException(nameof(filePath));
             var uri = new Uri(System.IO.Path.GetFullPath(filePath));
             var doc = GetDoc(uri);
             return doc as ITextDocument;
@@ -74,10 +65,7 @@ namespace CShell
         /// <summary>
         /// Gets the current text document.
         /// </summary>
-        public static ITextDocument GetTextDoc()
-        {
-            return UI.ActiveItem as ITextDocument;
-        }
+        public static ITextDocument GetTextDoc() => Ui.ActiveItem as ITextDocument;
 
         #region Files
         /// <summary>
@@ -103,7 +91,7 @@ namespace CShell
         /// <exception cref="FileNotFoundException">If the file doesn't exist.</exception>
         public static void Open(string filePath)
         {
-            if (filePath == null) throw new ArgumentNullException("filePath");
+            if (filePath == null) throw new ArgumentNullException(nameof(filePath));
             if(File.Exists(filePath))
                 Show.Document(filePath).BeginExecute();
             else

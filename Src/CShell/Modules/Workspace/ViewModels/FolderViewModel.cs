@@ -16,7 +16,7 @@ namespace CShell.Modules.Workspace.ViewModels
     public class FolderViewModel : TreeViewModel
     {
         protected DirectoryInfo directoryInfo;
-        private readonly CShell.Workspace workspace;
+        private readonly CShell.Workspace _workspace;
 
         protected FolderViewModel(string path, CShell.Workspace workspace)
             :this(new DirectoryInfo(path),workspace)
@@ -25,17 +25,14 @@ namespace CShell.Modules.Workspace.ViewModels
         public FolderViewModel(DirectoryInfo info, CShell.Workspace workspace)
         {
             directoryInfo = info;
-            this.workspace = workspace;
+            this._workspace = workspace;
             DisplayName = directoryInfo.Name;
             IsEditable = true;
         }
 
-        public CShell.Workspace Workspace
-        {
-            get { return workspace; }
-        }
+        public CShell.Workspace Workspace => _workspace;
 
-        public DirectoryInfo DirectoryInfo { get { return directoryInfo; } }
+        public DirectoryInfo DirectoryInfo => directoryInfo;
 
         public override Uri IconSource
         {
@@ -48,21 +45,12 @@ namespace CShell.Modules.Workspace.ViewModels
             }
         }
 
-        public string RelativePath
-        {
-            get { return PathHelper.ToRelativePath(Environment.CurrentDirectory, directoryInfo.FullName); }
-        }
+        public string RelativePath => PathHelper.ToRelativePath(Environment.CurrentDirectory, directoryInfo.FullName);
 
-        public string ToolTip
-        {
-            get { return RelativePath; }
-        }
+        public string ToolTip => RelativePath;
 
-        private BindableCollection<TreeViewModel> children;
-        public override IObservableCollection<TreeViewModel> Children
-        {
-            get { return children ?? (children = LoadChildren()); }
-        }
+        private BindableCollection<TreeViewModel> _children;
+        public override IObservableCollection<TreeViewModel> Children => _children ?? (_children = LoadChildren());
 
         protected virtual BindableCollection<TreeViewModel> LoadChildren()
         {
@@ -78,7 +66,7 @@ namespace CShell.Modules.Workspace.ViewModels
               {
                   if(filters.Any(f => f.IsMatch(dir.Name)))
                       continue;
-                  var folderVm = new FolderViewModel(dir, workspace);
+                  var folderVm = new FolderViewModel(dir, _workspace);
                   items.Add(folderVm);
               }
               var files = directoryInfo.GetFiles();
@@ -147,11 +135,8 @@ namespace CShell.Modules.Workspace.ViewModels
             }
         }
 
-        public static string WildcardToRegex(string pattern)
-        {
-            return "^" + Regex.Escape(pattern).
-                               Replace(@"\*", ".*").
-                               Replace(@"\?", ".") + "$";
-        }
+        public static string WildcardToRegex(string pattern) => "^" + Regex.Escape(pattern).
+            Replace(@"\*", ".*").
+            Replace(@"\?", ".") + "$";
     }
 }

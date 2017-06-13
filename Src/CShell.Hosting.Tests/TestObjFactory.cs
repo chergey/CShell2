@@ -38,18 +38,15 @@ namespace CShell.Hosting.Tests
                 new ReplCommands.InstallCommand(PackageInstaller, PackageAssemblyResolver, Log, InstallationProvider),
             };
         }
-        public ReplScriptExecutor GetReplExecutor()
-        {
-            return new ReplScriptExecutor(this.ReplOutput,
-                this.ObjectSerializer,
-                this.FileSystem,
-                this.FilePreProcessor,
-                this.ScriptEngine,
-                this.LogProvider,
-                this.Commands,
-                this.DefaultReferences
-                );
-        }
+        public ReplScriptExecutor GetReplExecutor() => new ReplScriptExecutor(this.ReplOutput,
+            this.ObjectSerializer,
+            this.FileSystem,
+            this.FilePreProcessor,
+            this.ScriptEngine,
+            this.LogProvider,
+            this.Commands,
+            this.DefaultReferences
+            );
 
         public ILog Log { get; private set; }
         public ILogProvider LogProvider { get; private set; }

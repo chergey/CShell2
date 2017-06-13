@@ -29,26 +29,20 @@ namespace CShell.Framework.Services
         /// Logs the exception.
         /// </summary>
         /// <param name="exception">The exception.</param>
-        public void Error(Exception exception)
-        {
-            _innerLogger.Error(exception, exception.Message);
-        }
+        public void Error(Exception exception) => _innerLogger.Error(exception, exception.Message);
+
         /// <summary>
         /// Logs the message as info.
         /// </summary>
         /// <param name="format">A formatted message.</param><param name="args">Parameters to be injected into the formatted message.</param>
-        public void Info(string format, params object[] args)
-        {
-            _innerLogger.Info(format, args);
-        }
+        public void Info(string format, params object[] args) => _innerLogger.Info(format, args);
+
         /// <summary>
         /// Logs the message as a warning.
         /// </summary>
         /// <param name="format">A formatted message.</param><param name="args">Parameters to be injected into the formatted message.</param>
-        public void Warn(string format, params object[] args)
-        {
-            _innerLogger.Warn(format, args);
-        }
+        public void Warn(string format, params object[] args) => _innerLogger.Warn(format, args);
+
         #endregion
 
         #region Implementation of ILogExtended
@@ -57,20 +51,16 @@ namespace CShell.Framework.Services
         /// </summary>
         /// <param name="format">A formatted message.</param>
         /// <param name="args">Parameters to be injected into the formatted message.</param>
-        public void Error(string format, params object[] args)
-        {
-            _innerLogger.Error(format, args);
-        }
+        public void Error(string format, params object[] args) => _innerLogger.Error(format, args);
+
         /// <summary>
         /// Logs the exception.
         /// </summary>
         /// <param name="exception">The exception.</param>
         /// <param name="format">A formatted message.</param>
         /// <param name="args">Parameters to be injected into the formatted message.</param>
-        public void Error(Exception exception, string format, params object[] args)
-        {
-            _innerLogger.ErrorException(string.Format(format, args), exception);
-        }
+        public void Error(Exception exception, string format, params object[] args) => _innerLogger.ErrorException(string.Format(format, args), exception);
+
         #endregion
     }
 }

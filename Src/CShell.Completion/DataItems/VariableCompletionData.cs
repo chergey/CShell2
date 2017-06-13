@@ -13,7 +13,7 @@ namespace CShell.Completion.DataItems
     {
         public VariableCompletionData(IVariable variable)
         {
-            if (variable == null) throw new ArgumentNullException("variable");
+            if (variable == null) throw new ArgumentNullException(nameof(variable));
             Variable = variable;
 
             IAmbience ambience = new CSharpAmbience();

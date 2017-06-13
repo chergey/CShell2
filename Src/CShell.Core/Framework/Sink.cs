@@ -18,12 +18,9 @@ namespace CShell.Framework
 
         public abstract void Clear();
 
-		public virtual Uri IconSource
-		{
-			get { return null; }
-		}
+		public virtual Uri IconSource => null;
 
-		private bool _isVisible;
+        private bool _isVisible;
 		public bool IsVisible
 		{
 			get { return _isVisible; }
@@ -34,10 +31,7 @@ namespace CShell.Framework
 			}
 		}
 
-        public virtual PaneLocation PreferredLocation
-        {
-            get { return PaneLocation.Right; }
-        }
+        public virtual PaneLocation PreferredLocation => PaneLocation.Right;
 
         /// <summary>
         /// Gets the display name from the uri, which is usually the second part of the absolute path.

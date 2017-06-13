@@ -15,17 +15,14 @@ namespace CShell
     /// </summary>
     public static partial class Shell
     {
-        private static readonly Lazy<IShell> _shellLazy = new Lazy<IShell>(() => IoC.Get<IShell>());
-        private static IShell UI { get { return _shellLazy.Value; } }
+        private static readonly Lazy<IShell> ShellLazy = new Lazy<IShell>(() => IoC.Get<IShell>());
+        private static IShell Ui => ShellLazy.Value;
 
         /// <summary>
         /// Update the progress in the staus bar.
         /// </summary>
         /// <param name="progress">The progress between 0 and 100.</param>
-        public static void UpdateProgress(int progress)
-        {
-            UI.StatusBar.UpdateProgress(progress);
-        }
+        public static void UpdateProgress(int progress) => Ui.StatusBar.UpdateProgress(progress);
 
         #region Evaluate helpers
         ///// <summary>

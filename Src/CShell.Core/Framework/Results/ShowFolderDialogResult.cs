@@ -22,7 +22,7 @@ namespace CShell.Framework.Results
 	    public void Execute(CoroutineExecutionContext context)
 	    {
 	        var dialog = new FolderBrowserDialog();
-            if(!String.IsNullOrEmpty(SelectedFolder))
+            if(!string.IsNullOrEmpty(SelectedFolder))
                 dialog.SelectedPath = SelectedFolder;
 	        var result = dialog.ShowDialog();
 	        SelectedFolder = dialog.SelectedPath;

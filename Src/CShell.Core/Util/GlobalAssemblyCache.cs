@@ -13,18 +13,12 @@ namespace CShell.Util
     /// </summary>
     public static class GlobalAssemblyCache
     {
-        static readonly string cachedGacPathV2 = Fusion.GetGacPath(false);
-        static readonly string cachedGacPathV4 = Fusion.GetGacPath(true);
+        static readonly string CachedGacPathV2 = Fusion.GetGacPath(false);
+        static readonly string CachedGacPathV4 = Fusion.GetGacPath(true);
 
-        public static string GacRootPathV2
-        {
-            get { return cachedGacPathV2; }
-        }
+        public static string GacRootPathV2 => CachedGacPathV2;
 
-        public static string GacRootPathV4
-        {
-            get { return cachedGacPathV4; }
-        }
+        public static string GacRootPathV4 => CachedGacPathV4;
 
         //public static bool IsWithinGac(string assemblyLocation)
         //{
@@ -56,10 +50,7 @@ namespace CShell.Util
         /// <summary>
         /// Gets the full display name of the GAC assembly of the specified short name
         /// </summary>
-        public static AssemblyName FindBestMatchingAssemblyName(string name)
-        {
-            return FindBestMatchingAssemblyName(new AssemblyName(name));
-        }
+        public static AssemblyName FindBestMatchingAssemblyName(string name) => FindBestMatchingAssemblyName(new AssemblyName(name));
 
         public static AssemblyName FindBestMatchingAssemblyName(AssemblyName name)
         {
@@ -162,9 +153,9 @@ namespace CShell.Util
         // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         //
 
-        static readonly string[] gac_paths = { GacRootPathV2, GacRootPathV4 };
-        static readonly string[] gacs = { "GAC_MSIL", "GAC_32", "GAC" };
-        static readonly string[] prefixes = { string.Empty, "v4.0_" };
+        static readonly string[] GacPaths = { GacRootPathV2, GacRootPathV4 };
+        static readonly string[] Gacs = { "GAC_MSIL", "GAC_32", "GAC" };
+        static readonly string[] Prefixes = { string.Empty, "v4.0_" };
 
         /// <summary>
         /// Gets the file name for an assembly stored in the GAC.
@@ -177,10 +168,10 @@ namespace CShell.Util
 
             for (int i = 0; i < 2; i++)
             {
-                for (int j = 0; j < gacs.Length; j++)
+                for (int j = 0; j < Gacs.Length; j++)
                 {
-                    var gac = Path.Combine(gac_paths[i], gacs[j]);
-                    var file = GetAssemblyFile(reference, prefixes[i], gac);
+                    var gac = Path.Combine(GacPaths[i], Gacs[j]);
+                    var file = GetAssemblyFile(reference, Prefixes[i], gac);
                     if (File.Exists(file))
                         return file;
                 }
@@ -191,33 +182,33 @@ namespace CShell.Util
 
         static string GetAssemblyFile(AssemblyName reference, string prefix, string gac)
         {
-            var gac_folder = new StringBuilder()
+            var gacFolder = new StringBuilder()
                 .Append(prefix)
                 .Append(reference.Version)
                 .Append("__");
 
-            gac_folder.Append(PublicKeyTokenToString(reference));
+            gacFolder.Append(PublicKeyTokenToString(reference));
 
             return Path.Combine(
                 Path.Combine(
-                    Path.Combine(gac, reference.Name), gac_folder.ToString()),
+                    Path.Combine(gac, reference.Name), gacFolder.ToString()),
                 reference.Name + ".dll");
         }
 
         //example from here: http://msdn.microsoft.com/en-us/library/system.reflection.assemblyname.getpublickeytoken(v=vs.95).aspx
-        private const byte mask = 15;
-        private const string hex = "0123456789ABCDEF";
+        private const byte Mask = 15;
+        private const string Hex = "0123456789ABCDEF";
 
         public static string PublicKeyTokenToString(AssemblyName assemblyName)
         {
             var pkt = new System.Text.StringBuilder();
             if (assemblyName.GetPublicKeyToken() == null)
-                return String.Empty;
+                return string.Empty;
 
             foreach (byte b in assemblyName.GetPublicKeyToken())
             {
-                pkt.Append(hex[b / 16 & mask]);
-                pkt.Append(hex[b & mask]);
+                pkt.Append(Hex[b / 16 & Mask]);
+                pkt.Append(Hex[b & Mask]);
             }
             return pkt.ToString();
         }

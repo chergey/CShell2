@@ -13,8 +13,8 @@ namespace CShell.Completion
 {
     public class CodeTextEditor : ICSharpCode.AvalonEdit.TextEditor
     {
-        CompletionWindow completionWindow;
-        OverloadInsightWindow insightWindow;
+        CompletionWindow _completionWindow;
+        OverloadInsightWindow _insightWindow;
 
         public CodeTextEditor()
         {
@@ -41,10 +41,10 @@ namespace CShell.Completion
             if (!System.IO.File.Exists(fileName))
                 throw new FileNotFoundException(fileName);
 
-            if (completionWindow != null)
-                completionWindow.Close();
-            if (insightWindow != null)
-                insightWindow.Close();
+            if (_completionWindow != null)
+                _completionWindow.Close();
+            if (_insightWindow != null)
+                _insightWindow.Close();
 
             FileName = fileName;
             Load(fileName);
@@ -53,7 +53,7 @@ namespace CShell.Completion
 
         public bool SaveFile()
         {
-            if (String.IsNullOrEmpty(FileName))
+            if (string.IsNullOrEmpty(FileName))
                 return false;
 
             Save(FileName);
@@ -63,15 +63,9 @@ namespace CShell.Completion
 
 
         #region Code Completion
-        private void OnTextEntered(object sender, TextCompositionEventArgs textCompositionEventArgs)
-        {
-            ShowCompletion(textCompositionEventArgs.Text, false);
-        }
+        private void OnTextEntered(object sender, TextCompositionEventArgs textCompositionEventArgs) => ShowCompletion(textCompositionEventArgs.Text, false);
 
-        private void OnCtrlSpaceCommand(object sender, ExecutedRoutedEventArgs executedRoutedEventArgs)
-        {
-            ShowCompletion(null, true);
-        }
+        private void OnCtrlSpaceCommand(object sender, ExecutedRoutedEventArgs executedRoutedEventArgs) => ShowCompletion(null, true);
 
         private void ShowCompletion(string enteredText, bool controlSpace)
         {
@@ -81,7 +75,7 @@ namespace CShell.Completion
                 Debug.WriteLine("Code Completion: Ctrl+Space");
 
             //only process csharp files and if there is a code completion engine available
-            if (String.IsNullOrEmpty(FileName))
+            if (string.IsNullOrEmpty(FileName))
             {
                 Debug.WriteLine("No document file name, cannot run code completion");
                 return;
@@ -103,7 +97,7 @@ namespace CShell.Completion
                 return;
             }
 
-            if (completionWindow == null)
+            if (_completionWindow == null)
             {
                 CodeCompletionResult results = null;
                 try
@@ -119,24 +113,24 @@ namespace CShell.Completion
                 if (results == null)
                     return;
 
-                if (insightWindow == null && results.OverloadProvider != null)
+                if (_insightWindow == null && results.OverloadProvider != null)
                 {
-                    insightWindow = new OverloadInsightWindow(TextArea);
-                    insightWindow.Provider = results.OverloadProvider;
-                    insightWindow.Show();
-                    insightWindow.Closed += (o, args) => insightWindow = null;
+                    _insightWindow = new OverloadInsightWindow(TextArea);
+                    _insightWindow.Provider = results.OverloadProvider;
+                    _insightWindow.Show();
+                    _insightWindow.Closed += (o, args) => _insightWindow = null;
                     return;
                 }
 
-                if (completionWindow == null && results != null && results.CompletionData.Any())
+                if (_completionWindow == null && results != null && results.CompletionData.Any())
                 {
                     // Open code completion after the user has pressed dot:
-                    completionWindow = new CompletionWindow(TextArea);
-                    completionWindow.CloseWhenCaretAtBeginning = controlSpace;
-                    completionWindow.StartOffset -= results.TriggerWordLength;
+                    _completionWindow = new CompletionWindow(TextArea);
+                    _completionWindow.CloseWhenCaretAtBeginning = controlSpace;
+                    _completionWindow.StartOffset -= results.TriggerWordLength;
                     //completionWindow.EndOffset -= results.TriggerWordLength;
 
-                    IList<ICompletionData> data = completionWindow.CompletionList.CompletionData;
+                    IList<ICompletionData> data = _completionWindow.CompletionList.CompletionData;
                     var additionalCompletions = GetAdditionalCompletions();
                     if (additionalCompletions != null && additionalCompletions.Count > 0)
                     {
@@ -152,19 +146,19 @@ namespace CShell.Completion
                     if (results.TriggerWordLength > 0)
                     {
                         //completionWindow.CompletionList.IsFiltering = false;
-                        completionWindow.CompletionList.SelectItem(results.TriggerWord);
+                        _completionWindow.CompletionList.SelectItem(results.TriggerWord);
                     }
-                    completionWindow.Show();
-                    completionWindow.Closed += (o, args) => completionWindow = null;
+                    _completionWindow.Show();
+                    _completionWindow.Closed += (o, args) => _completionWindow = null;
                 }
             }//end if
 
 
             //update the insight window
-            if (!string.IsNullOrEmpty(enteredText) && insightWindow != null)
+            if (!string.IsNullOrEmpty(enteredText) && _insightWindow != null)
             {
                 //whenver text is entered update the provider
-                var provider = insightWindow.Provider as CSharpOverloadProvider;
+                var provider = _insightWindow.Provider as CSharpOverloadProvider;
                 if (provider != null)
                 {
                     //since the text has not been added yet we need to tread it as if the char has already been inserted
@@ -174,8 +168,8 @@ namespace CShell.Completion
                     //if the windows is requested to be closed we do it here
                     if (provider.RequestClose)
                     {
-                        insightWindow.Close();
-                        insightWindow = null;
+                        _insightWindow.Close();
+                        _insightWindow = null;
                     }
                 }
             }
@@ -184,13 +178,13 @@ namespace CShell.Completion
         private void OnTextEntering(object sender, TextCompositionEventArgs textCompositionEventArgs)
         {
             Debug.WriteLine("TextEntering: " + textCompositionEventArgs.Text);
-            if (textCompositionEventArgs.Text.Length > 0 && completionWindow != null)
+            if (textCompositionEventArgs.Text.Length > 0 && _completionWindow != null)
             {
                 if (!char.IsLetterOrDigit(textCompositionEventArgs.Text[0]))
                 {
                     // Whenever a non-letter is typed while the completion window is open,
                     // insert the currently selected element.
-                    completionWindow.CompletionList.RequestInsertion(textCompositionEventArgs);
+                    _completionWindow.CompletionList.RequestInsertion(textCompositionEventArgs);
                 }
             }
             // Do not set e.Handled=true.
@@ -208,15 +202,10 @@ namespace CShell.Completion
             return new ReadOnlyDocument(new StringTextSource(Text), FileName);
         }
 
-        protected virtual string[] GetNamespaces()
-        {
-            return null;
-        }
+        protected virtual string[] GetNamespaces() => null;
 
-        protected virtual IDictionary<string, string> GetAdditionalCompletions()
-        {
-            return null;
-        }
+        protected virtual IDictionary<string, string> GetAdditionalCompletions() => null;
+
         #endregion
 
 

@@ -25,24 +25,21 @@ namespace CShell.Framework.Services
 
         public void Activate()
         {
-            isActive = true;
+            _isActive = true;
             if(Activated != null)
                 Activated(this, new ActivationEventArgs());
         }
 
         public event EventHandler<ActivationEventArgs> Activated;
 
-        private bool isActive = false;
-        public bool IsActive
-        {
-            get { return isActive; }
-        }
+        private bool _isActive = false;
+        public bool IsActive => _isActive;
 
         public event EventHandler<DeactivationEventArgs> AttemptingDeactivation;
 
         public void Deactivate(bool close)
         {
-            isActive = false;
+            _isActive = false;
 
             if (AttemptingDeactivation != null)
                 AttemptingDeactivation(this, new DeactivationEventArgs(){WasClosed = false});
@@ -55,9 +52,6 @@ namespace CShell.Framework.Services
 
 
 
-        public void Handle(WorkspaceOpenedEventArgs message)
-        {
-            Activate();
-        }
+        public void Handle(WorkspaceOpenedEventArgs message) => Activate();
     }
 }

@@ -9,53 +9,50 @@ namespace CShell.Modules.Shell.ViewModels
 	[Export(typeof(IStatusBar))]
 	public class StatusBarViewModel : PropertyChangedBase, IStatusBar
 	{
-        private readonly object syncRoot = new object();
+        private readonly object _syncRoot = new object();
 	    private const string DefaultMessage = "Ready";
 
-		private string message;
+		private string _message;
 		public string Message
 		{
-            get { lock(syncRoot) return message; }
+            get { lock(_syncRoot) return _message; }
 		}
 
-        public void UpdateMessage()
-        {
-            UpdateMessage(DefaultMessage);
-        }
+        public void UpdateMessage() => UpdateMessage(DefaultMessage);
 
-        public void UpdateMessage(string message)
+	    public void UpdateMessage(string message)
         {
-            lock (syncRoot)
+            lock (_syncRoot)
             {
-                this.message = message;
+                this._message = message;
             }
-            Execute.OnUIThread(()=>NotifyOfPropertyChange(() => Message));
+            Execute.OnUiThread(()=>NotifyOfPropertyChange(() => Message));
         }
 
-	    private int progress = 0;
+	    private int _progress = 0;
         public int Progress
         {
-            get { lock (syncRoot) return progress; }
+            get { lock (_syncRoot) return _progress; }
         }
 
-	    private bool showingProgress;
+	    private bool _showingProgress;
         public bool ShowingProgress
         {
-            get { lock (syncRoot) return showingProgress; }
+            get { lock (_syncRoot) return _showingProgress; }
         }
 
         public bool IndeterminateProgress
         {
-            get { lock (syncRoot) return progress <= 0; }
+            get { lock (_syncRoot) return _progress <= 0; }
         }
 
         public void UpdateProgress(bool running)
         {
-            lock (syncRoot)
+            lock (_syncRoot)
             {
-                showingProgress = running;
+                _showingProgress = running;
                 if (!running)
-                    progress = 0;
+                    _progress = 0;
             }
             NotifyOfPropertyChange(() => Progress);
             NotifyOfPropertyChange(() => ShowingProgress);
@@ -70,10 +67,10 @@ namespace CShell.Modules.Shell.ViewModels
             else if (progress > 100)
                 prog = 100;
 
-            lock (syncRoot)
+            lock (_syncRoot)
             {
-                showingProgress = true;
-                this.progress = prog;
+                _showingProgress = true;
+                this._progress = prog;
             }
             NotifyOfPropertyChange(() => Progress);
             NotifyOfPropertyChange(() => ShowingProgress);

@@ -4,65 +4,53 @@ namespace CShell.Modules.Repl.Controls
 {
     internal class CommandHistory
     {
-        private int currentPosn;
-        private string lastCommand;
-        private readonly CommandQueue<string> commandHistory = new CommandQueue<string>(Settings.Default.REPLBuffer);
+        private int _currentPosn;
+        private string _lastCommand;
+        private readonly CommandQueue<string> _commandHistory = new CommandQueue<string>(Settings.Default.REPLBuffer);
 
         internal void Add(string command)
         {
             if(string.IsNullOrWhiteSpace(command))
                 return;
 
-            if (command != lastCommand)
+            if (command != _lastCommand)
             {
-                commandHistory.Add(command);
-                lastCommand = command;
-                currentPosn = commandHistory.Count;
+                _commandHistory.Add(command);
+                _lastCommand = command;
+                _currentPosn = _commandHistory.Count;
             }
             else
             {
-                currentPosn++;
+                _currentPosn++;
             }
         }
 
-        internal bool DoesPreviousCommandExist()
-        {
-            return currentPosn > 0;
-        }
+        internal bool DoesPreviousCommandExist() => _currentPosn > 0;
 
-        internal bool DoesNextCommandExist()
-        {
-            return currentPosn < commandHistory.Count;
-        }
+        internal bool DoesNextCommandExist() => _currentPosn < _commandHistory.Count;
 
         internal string GetPreviousCommand()
         {
-            lastCommand = commandHistory[--currentPosn];
-            return lastCommand;
+            _lastCommand = _commandHistory[--_currentPosn];
+            return _lastCommand;
         }
 
         internal string GetNextCommand()
         {
-            if (currentPosn == commandHistory.Count - 1)
+            if (_currentPosn == _commandHistory.Count - 1)
             {
-                currentPosn++;
+                _currentPosn++;
                 return "";
             }
             else
             { 
-                lastCommand = (string)commandHistory[++currentPosn];
+                _lastCommand = (string)_commandHistory[++_currentPosn];
                 return LastCommand;
             }
         }
 
-        internal string LastCommand
-        {
-            get { return lastCommand; }
-        }
+        internal string LastCommand => _lastCommand;
 
-        internal string[] GetCommandHistory()
-        {
-            return commandHistory.ToArray();
-        }
+        internal string[] GetCommandHistory() => _commandHistory.ToArray();
     }
 }

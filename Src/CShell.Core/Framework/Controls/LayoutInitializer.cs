@@ -77,7 +77,7 @@ namespace CShell.Framework.Controls
 				case PaneLocation.Bottom:
 					return "BottomPane";
 				default:
-					throw new ArgumentOutOfRangeException("location");
+					throw new ArgumentOutOfRangeException(nameof(location));
 			}
 		}
 
@@ -86,10 +86,7 @@ namespace CShell.Framework.Controls
 			
 		}
 
-	    public bool BeforeInsertDocument(LayoutRoot layout, LayoutDocument anchorableToShow, ILayoutContainer destinationContainer)
-	    {
-	        return false;
-	    }
+	    public bool BeforeInsertDocument(LayoutRoot layout, LayoutDocument anchorableToShow, ILayoutContainer destinationContainer) => false;
 
 	    public void AfterInsertDocument(LayoutRoot layout, LayoutDocument anchorableShown)
 	    {

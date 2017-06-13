@@ -14,12 +14,9 @@ namespace CShell.Modules.Shell.Views
 		        InitializeComponent();
 		}
 
-        public DockingManager DockingManager
-        {
-            get { return this.Manager; }
-        }
+        public DockingManager DockingManager => this.Manager;
 
-        #region Window Location
+	    #region Window Location
 
 	    public CShell.Workspace.WindowLocation GetWindowLocation()
 	    {

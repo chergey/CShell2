@@ -24,16 +24,15 @@
 
 	<DockPanel>
 		<controls:Menu ItemsSource="{Binding MainMenu}"
-			  ItemTemplate="{StaticResource menuTemplate}" 
+			  ItemTemplate="{StaticResource MenuTemplate}" 
               DockPanel.Dock="Top" />
 
         <controls:ToolBar ItemsSource="{Binding ToolBar}"
-              ItemTemplate="{StaticResource toolBarTemplate}"
+              ItemTemplate="{StaticResource ToolBarTemplate}"
               DockPanel.Dock="Top" />
 
 		<StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem>
-                <ProgressBar Value="{Binding StatusBar.Progress, Mode=OneWay}" 
                          Visibility="{Binding StatusBar.ShowingProgress, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" 
                          Width="100" Height="15" 
                          Orientation="Horizontal" 

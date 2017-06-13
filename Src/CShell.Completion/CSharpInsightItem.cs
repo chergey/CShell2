@@ -18,29 +18,29 @@ namespace CShell.Completion
             this.Method = method;
         }
 
-        TextBlock header;
+        TextBlock _header;
 
         public object Header
         {
             get
             {
-                if (header == null)
+                if (_header == null)
                 {
-                    header = new TextBlock();
+                    _header = new TextBlock();
                     GenerateHeader();
                 }
-                return header;
+                return _header;
             }
         }
 
-        int highlightedParameterIndex = -1;
+        int _highlightedParameterIndex = -1;
 
         public void HighlightParameter(int parameterIndex)
         { 
-            if (highlightedParameterIndex == parameterIndex)
+            if (_highlightedParameterIndex == parameterIndex)
                 return;
-            this.highlightedParameterIndex = parameterIndex;
-            if (header != null)
+            this._highlightedParameterIndex = parameterIndex;
+            if (_header != null)
                 GenerateHeader();
         }
 
@@ -49,55 +49,52 @@ namespace CShell.Completion
             CSharpAmbience ambience = new CSharpAmbience();
             ambience.ConversionFlags = ConversionFlags.StandardConversionFlags;
             var stringBuilder = new StringBuilder();
-            var formatter = new ParameterHighlightingOutputFormatter(stringBuilder, highlightedParameterIndex);
+            var formatter = new ParameterHighlightingOutputFormatter(stringBuilder, _highlightedParameterIndex);
             ambience.ConvertEntity(Method, formatter, FormattingOptionsFactory.CreateSharpDevelop());
             var inlineBuilder = new HighlightedInlineBuilder(stringBuilder.ToString());
-            inlineBuilder.SetFontWeight(formatter.parameterStartOffset, formatter.parameterLength, FontWeights.Bold);
-            header.Inlines.Clear();
-            header.Inlines.AddRange(inlineBuilder.CreateRuns());
+            inlineBuilder.SetFontWeight(formatter.ParameterStartOffset, formatter.ParameterLength, FontWeights.Bold);
+            _header.Inlines.Clear();
+            _header.Inlines.AddRange(inlineBuilder.CreateRuns());
         }
 
-        public object Content
-        {
-            get { return Documentation; }
-        }
+        public object Content => Documentation;
 
-        private string documentation;
+        private string _documentation;
         public string Documentation
         {
             get
             {
-                if (documentation == null)
+                if (_documentation == null)
                 {
                     if (Method.Documentation == null)
-                        documentation = "";
+                        _documentation = "";
                     else
-                        documentation = EntityCompletionData.XmlDocumentationToText(Method.Documentation);
+                        _documentation = EntityCompletionData.XmlDocumentationToText(Method.Documentation);
                 }
-                return documentation;
+                return _documentation;
             }
         }
 
         sealed class ParameterHighlightingOutputFormatter : TextWriterTokenWriter
         {
-            StringBuilder b;
-            int highlightedParameterIndex;
-            int parameterIndex;
-            internal int parameterStartOffset;
-            internal int parameterLength;
+            StringBuilder _b;
+            int _highlightedParameterIndex;
+            int _parameterIndex;
+            internal int ParameterStartOffset;
+            internal int ParameterLength;
 
             public ParameterHighlightingOutputFormatter(StringBuilder b, int highlightedParameterIndex)
                 : base(new StringWriter(b))
             {
-                this.b = b;
-                this.highlightedParameterIndex = highlightedParameterIndex;
+                this._b = b;
+                this._highlightedParameterIndex = highlightedParameterIndex;
             }
 
             public override void StartNode(AstNode node)
             {
-                if (parameterIndex == highlightedParameterIndex && node is ParameterDeclaration)
+                if (_parameterIndex == _highlightedParameterIndex && node is ParameterDeclaration)
                 {
-                    parameterStartOffset = b.Length;
+                    ParameterStartOffset = _b.Length;
                 }
                 base.StartNode(node);
             }
@@ -107,9 +104,9 @@ namespace CShell.Completion
                 base.EndNode(node);
                 if (node is ParameterDeclaration)
                 {
-                    if (parameterIndex == highlightedParameterIndex)
-                        parameterLength = b.Length - parameterStartOffset;
-                    parameterIndex++;
+                    if (_parameterIndex == _highlightedParameterIndex)
+                        ParameterLength = _b.Length - ParameterStartOffset;
+                    _parameterIndex++;
                 }
             }
         }

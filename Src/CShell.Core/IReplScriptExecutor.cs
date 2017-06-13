@@ -9,7 +9,7 @@ using ScriptCs.Contracts;
 
 namespace CShell
 {
-    public interface IReplScriptExecutor : IRepl, IScriptExecutor
+    public interface IReplScriptExecutor : IRepl
     {
         event EventHandler<EventArgs> AssemblyReferencesChanged;
 

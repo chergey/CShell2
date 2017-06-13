@@ -12,54 +12,42 @@ namespace CShell.Completion
 {
     public class CSharpOverloadProvider : INotifyPropertyChanged, IOverloadProvider, IParameterDataProvider
     {
-        private readonly CSharpCompletionContext context;
-        private readonly int startOffset;
-        internal readonly IList<CSharpInsightItem> items;
-        private int selectedIndex;
+        private readonly CSharpCompletionContext _context;
+        private readonly int _startOffset;
+        internal readonly IList<CSharpInsightItem> Items;
+        private int _selectedIndex;
 
         public CSharpOverloadProvider(CSharpCompletionContext context, int startOffset, IEnumerable<CSharpInsightItem> items)
         {
             Debug.Assert(items != null);
-            this.context = context;
-            this.startOffset = startOffset;
-            this.selectedIndex = 0;
-            this.items = items.ToList();
+            this._context = context;
+            this._startOffset = startOffset;
+            this._selectedIndex = 0;
+            this.Items = items.ToList();
 
             Update(context);
         }
 
         public bool RequestClose { get; set; }
 
-        public int Count
-        {
-            get { return items.Count; }
-        }
+        public int Count => Items.Count;
 
-        public object CurrentContent
-        {
-            get { return items[selectedIndex].Content; }
-        }
+        public object CurrentContent => Items[_selectedIndex].Content;
 
-        public object CurrentHeader
-        {
-            get { return items[selectedIndex].Header; }
-        }
+        public object CurrentHeader => Items[_selectedIndex].Header;
 
-        public string CurrentIndexText
-        {
-            get { return (selectedIndex + 1).ToString() + " of " + this.Count.ToString(); }
-        }
+        public string CurrentIndexText => (_selectedIndex + 1).ToString() + " of " + this.Count.ToString();
 
         public int SelectedIndex
         {
-            get { return selectedIndex; }
+            get { return _selectedIndex; }
             set
             {
-                selectedIndex = value;
-                if (selectedIndex >= items.Count)
-                    selectedIndex = items.Count - 1;
-                if (selectedIndex < 0)
-                    selectedIndex = 0;
+                _selectedIndex = value;
+                if (_selectedIndex >= Items.Count)
+                    _selectedIndex = Items.Count - 1;
+                if (_selectedIndex < 0)
+                    _selectedIndex = 0;
                 OnPropertyChanged("SelectedIndex");
                 OnPropertyChanged("CurrentIndexText");
                 OnPropertyChanged("CurrentHeader");
@@ -69,7 +57,7 @@ namespace CShell.Completion
 
         public void Update(IDocument document, int offset)
         {
-            var completionContext = new CSharpCompletionContext(document, offset, context.ProjectContent, context.OriginalNamespaces);
+            var completionContext = new CSharpCompletionContext(document, offset, _context.ProjectContent, _context.OriginalNamespaces);
             Update(completionContext);
         }
 
@@ -87,7 +75,7 @@ namespace CShell.Completion
             var completionChar = completionContext.Document.GetCharAt(completionContext.Offset - 1);
             var docText = completionContext.Document.Text;
             Debug.Print("Update Completion char: '{0}'", completionChar);
-            int parameterIndex = pce.GetCurrentParameterIndex(startOffset, completionContext.Offset);
+            int parameterIndex = pce.GetCurrentParameterIndex(_startOffset, completionContext.Offset);
             if (parameterIndex < 0)
             {
                 RequestClose = true;
@@ -95,14 +83,14 @@ namespace CShell.Completion
             }
             else
             {
-                if (parameterIndex > items[selectedIndex].Method.Parameters.Count)
+                if (parameterIndex > Items[_selectedIndex].Method.Parameters.Count)
                 {
-                    var newItem = items.FirstOrDefault(i => parameterIndex <= i.Method.Parameters.Count);
-                    SelectedIndex = items.IndexOf(newItem);
+                    var newItem = Items.FirstOrDefault(i => parameterIndex <= i.Method.Parameters.Count);
+                    SelectedIndex = Items.IndexOf(newItem);
                 }
                 if (parameterIndex > 0)
                     parameterIndex--; // NR returns 1-based parameter index
-                foreach (var item in items)
+                foreach (var item in Items)
                 {
                     item.HighlightParameter(parameterIndex);
                 }
@@ -110,10 +98,7 @@ namespace CShell.Completion
         }
 
         #region IParameterDataProvider implementation
-        int IParameterDataProvider.StartOffset
-        {
-            get { return startOffset; }
-        }
+        int IParameterDataProvider.StartOffset => _startOffset;
 
         string IParameterDataProvider.GetHeading(int overload, string[] parameterDescription, int currentParameter)
         {

@@ -11,32 +11,32 @@ namespace CShell.Modules.Repl.Controls
 {
     internal class ConsoleStream : Stream
     {
-        private readonly TextType textType;
-        readonly Action<string, TextType> callback;
+        private readonly TextType _textType;
+        readonly Action<string, TextType> _callback;
 
         public ConsoleStream(TextType textType, Action<string, TextType> cb)
         {
-            this.textType = textType;
-            callback = cb;
+            this._textType = textType;
+            _callback = cb;
         }
 
-        public override bool CanRead { get { return false; } }
-        public override bool CanSeek { get { return false; } }
-        public override bool CanWrite { get { return true; } }
+        public override bool CanRead => false;
+        public override bool CanSeek => false;
+        public override bool CanWrite => true;
 
 
-        public override long Length { get { return 0; } }
+        public override long Length => 0;
         public override long Position { get { return 0; } set { } }
         public override void Flush() { }
-        public override int Read([In, Out] byte[] buffer, int offset, int count) { return -1; }
+        public override int Read([In, Out] byte[] buffer, int offset, int count) => -1;
 
-        public override long Seek(long offset, SeekOrigin origin) { return 0; }
+        public override long Seek(long offset, SeekOrigin origin) => 0;
 
         public override void SetLength(long value) { }
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            Execute.OnUIThread(() => callback(Encoding.UTF8.GetString(buffer, offset, count), textType));
+            Execute.OnUIThread(() => _callback(Encoding.UTF8.GetString(buffer, offset, count), _textType));
         }
     }
 }

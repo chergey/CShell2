@@ -15,7 +15,7 @@ namespace CShell.Modules.Workspace.Results
 {
     public class CopyReferencesResult : ResultBase
     {
-        private readonly IEnumerable<string> assemblyPaths;
+        private readonly IEnumerable<string> _assemblyPaths;
 
         [Import]
         public IShell Shell { get; set; }
@@ -25,12 +25,12 @@ namespace CShell.Modules.Workspace.Results
 
         public CopyReferencesResult(string file)
         {
-            this.assemblyPaths = new[] { file };
+            this._assemblyPaths = new[] { file };
         }
 
         public CopyReferencesResult(IEnumerable<string> files)
         {
-            this.assemblyPaths = files;
+            this._assemblyPaths = files;
         }
 
         public override void Execute(Caliburn.Micro.CoroutineExecutionContext context)
@@ -41,7 +41,7 @@ namespace CShell.Modules.Workspace.Results
                 if (!Directory.Exists(binDir))
                     Directory.CreateDirectory(binDir);
                 var copiedReferences = new List<string>();
-                foreach (var assemblyPath in assemblyPaths)
+                foreach (var assemblyPath in _assemblyPaths)
                 {
                     if (File.Exists(assemblyPath))
                     {

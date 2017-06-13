@@ -55,10 +55,10 @@ namespace CShell.Completion
             CompletionContextProvider = new DefaultCompletionContextProvider(Document, unresolvedFile);
         }
 
-        private static Regex replaceRegex = new Regex("[^a-zA-Z0-9_]");
+        private static Regex _replaceRegex = new Regex("[^a-zA-Z0-9_]");
         private static IDocument PrepareCompletionDocument(IDocument document, ref int offset, string[] namespaces = null)
         {
-            if (String.IsNullOrEmpty(document.FileName))
+            if (string.IsNullOrEmpty(document.FileName))
                 return document;
 
             //if the code is just a script it it will contain no namestpace, class and method structure and so the code completion will not work properly
@@ -66,12 +66,12 @@ namespace CShell.Completion
             //we only process the file if its a .csx file
             var fileExtension = Path.GetExtension(document.FileName);
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(document.FileName);
-            if (String.IsNullOrEmpty(fileExtension) || String.IsNullOrEmpty(fileNameWithoutExtension))
+            if (string.IsNullOrEmpty(fileExtension) || string.IsNullOrEmpty(fileNameWithoutExtension))
                 return document;
 
             if (fileExtension.ToLower() == ".csx")
             {
-                var className = replaceRegex.Replace(fileNameWithoutExtension, "");
+                var className = _replaceRegex.Replace(fileNameWithoutExtension, "");
                 className = className.TrimStart('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'); //there can be no number at the beginning of the class name
                 var header = "";
                 if (namespaces != null && namespaces.Length > 0)

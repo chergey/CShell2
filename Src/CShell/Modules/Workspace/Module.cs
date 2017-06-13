@@ -58,22 +58,19 @@ namespace CShell.Modules.Workspace
 			yield return Show.Tool<WorkspaceViewModel>();
 		}
 
-        private IEnumerable<IResult> AddNewFile()
-        {
-            return GetSelectedFolder().AddNewFile();
-        }
+        private IEnumerable<IResult> AddNewFile() => GetSelectedFolder().AddNewFile();
 
-        private IEnumerable<IResult> AddNewFolder()
-        {
-            return GetSelectedFolder().AddNewFolder();
-        }
+	    private IEnumerable<IResult> AddNewFolder() => GetSelectedFolder().AddNewFolder();
 
-        public static IEnumerable<IResult> AddFileReferences()
+	    public static IEnumerable<IResult> AddFileReferences()
         {
-            var dialog = new OpenFileDialog();
-            dialog.Filter = CShell.Constants.AssemblyFileFilter;
-            dialog.Multiselect = true;
-            yield return Show.Dialog(dialog);
+	        var dialog = new OpenFileDialog
+	        {
+	            Filter = CShell.Constants.AssemblyFileFilter,
+	            Multiselect = true
+	        };
+	        yield return Show.Dialog(dialog);
+
             if (dialog.FileNames != null && dialog.FileNames.Length > 0)
             {
                 var docResult = new OpenDocumentResult(Constants.ReferencesFile);
@@ -98,9 +95,11 @@ namespace CShell.Modules.Workspace
 
         public static IEnumerable<IResult> CopyReferences()
         {
-            var dialog = new OpenFileDialog();
-            dialog.Filter = CShell.Constants.AssemblyFileFilter;
-            dialog.Multiselect = true;
+            var dialog = new OpenFileDialog
+            {
+                Filter = CShell.Constants.AssemblyFileFilter,
+                Multiselect = true
+            };
             yield return Show.Dialog(dialog);
             if (dialog.FileNames != null && dialog.FileNames.Length > 0)
             {

@@ -15,68 +15,57 @@ namespace CShell.Modules.Workspace.ViewModels
     [Export(typeof(ITool))]
     public class WorkspaceViewModel : Tool
 	{
-	    private readonly IShell shell;
-        private readonly CShell.Workspace workspace;
+	    private readonly IShell _shell;
+        private readonly CShell.Workspace _workspace;
 
 	    [ImportingConstructor]
         public WorkspaceViewModel(CShell.Workspace workspace)
         {
-            this.shell = shell;
+          //  this._shell = _shell;
             DisplayName = "Workspace Explorer";
-	        this.workspace = workspace;
-            this.workspace.PropertyChanged += WorkspaceOnPropertyChanged;
+	        this._workspace = workspace;
+            this._workspace.PropertyChanged += WorkspaceOnPropertyChanged;
         }
 
 	    #region Display
-        private TreeViewModel tree;
-        public TreeViewModel Tree
-        {
-            get { return tree; }
-        }
+        private TreeViewModel _tree;
+        public TreeViewModel Tree => _tree;
 
-		public override PaneLocation PreferredLocation
-		{
-			get { return PaneLocation.Left; }
-		} 
+	    public override PaneLocation PreferredLocation => PaneLocation.Left;
 
-		public override Uri IconSource
-		{
-			get { return new Uri("pack://application:,,,/CShell;component/Resources/Icons/FileBrowser.png"); }
-		}
+	    public override Uri IconSource => new Uri("pack://application:,,,/CShell;component/Resources/Icons/FileBrowser.png");
 
-        public override Uri Uri
-        {
-            get { return new Uri("tool://cshell/workspace"); }
-        }
-        #endregion
+	    public override Uri Uri => new Uri("tool://cshell/workspace");
+
+	    #endregion
 
         private void WorkspaceOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
             if (propertyChangedEventArgs.PropertyName == "WorkspaceDirectory")
             {   //teardown the current workspace
-                if (tree != null)
+                if (_tree != null)
                 {
-                    tree.Dispose();
-                    tree = null;
+                    _tree.Dispose();
+                    _tree = null;
                     NotifyOfPropertyChange(() => Tree);
                 }
 
-                if (workspace.WorkspaceDirectory != null && Directory.Exists(workspace.WorkspaceDirectory))
+                if (_workspace.WorkspaceDirectory != null && Directory.Exists(_workspace.WorkspaceDirectory))
                 {
-                    tree = new TreeViewModel();
+                    _tree = new TreeViewModel();
 
                     //add the assembly references
-                    var refs = new AssemblyReferencesViewModel(workspace.ReplExecutor);
-                    tree.Children.Add(refs);
+                    var refs = new AssemblyReferencesViewModel(_workspace.ReplExecutor);
+                    _tree.Children.Add(refs);
 
                     //add the file tree
                     //var files = new FileReferencesViewModel(workspace.Files, null);
-                    var files = new FolderRootViewModel(workspace.WorkspaceDirectory, workspace);
-                    tree.Children.Add(files);
+                    var files = new FolderRootViewModel(_workspace.WorkspaceDirectory, _workspace);
+                    _tree.Children.Add(files);
 
                     NotifyOfPropertyChange(() => Tree);
 
-                    Settings.Default.LastWorkspace = workspace.WorkspaceDirectory;
+                    Settings.Default.LastWorkspace = _workspace.WorkspaceDirectory;
                     Settings.Default.Save();
                 }
             }
@@ -84,10 +73,10 @@ namespace CShell.Modules.Workspace.ViewModels
 
         public IEnumerable<IResult> Open(object node)
         {
-            var fileVM = node as FileViewModel;
-            if(fileVM != null)
-                yield return Show.Document(fileVM.RelativePath);
-            yield break;
+            var fileVm = node as FileViewModel;
+            if(fileVm != null)
+                yield return Show.Document(fileVm.RelativePath);
+  
         }
 
         public IEnumerable<IResult> Selected(object node)

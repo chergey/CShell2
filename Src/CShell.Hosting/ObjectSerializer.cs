@@ -17,6 +17,11 @@ namespace CShell.Hosting
 
     class MockConsole : IConsole
     {
+        public string ReadLine(string prompt)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Clear()
         {
             throw new NotImplementedException();
@@ -38,6 +43,8 @@ namespace CShell.Hosting
                 throw new NotImplementedException();
             }
         }
+
+        public int Width { get; }
 
         public string ReadLine()
         {

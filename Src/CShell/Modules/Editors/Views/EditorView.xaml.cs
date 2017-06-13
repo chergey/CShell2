@@ -25,9 +25,9 @@ namespace CShell.Modules.Editors.Views
         #region Commend / Uncomment
         public void Comment()
         {
-            var document = textEditor.Document;
-            var start = document.GetLineByOffset(textEditor.SelectionStart);
-            var end = document.GetLineByOffset(textEditor.SelectionStart + textEditor.SelectionLength);
+            var document = TextEditor.Document;
+            var start = document.GetLineByOffset(TextEditor.SelectionStart);
+            var end = document.GetLineByOffset(TextEditor.SelectionStart + TextEditor.SelectionLength);
             using (document.RunUpdate())
             {
                 for (DocumentLine line = start; line!=null && line.LineNumber <= end.LineNumber; line = line.NextLine)
@@ -40,9 +40,9 @@ namespace CShell.Modules.Editors.Views
 
         public void Uncomment()
         {
-            var document = textEditor.Document;
-            var start = document.GetLineByOffset(textEditor.SelectionStart);
-            var end = document.GetLineByOffset(textEditor.SelectionStart + textEditor.SelectionLength);
+            var document = TextEditor.Document;
+            var start = document.GetLineByOffset(TextEditor.SelectionStart);
+            var end = document.GetLineByOffset(TextEditor.SelectionStart + TextEditor.SelectionLength);
             using (document.RunUpdate())
             {
                 for (DocumentLine line = start; line != null && line.LineNumber <= end.LineNumber; line = line.NextLine)
@@ -55,7 +55,7 @@ namespace CShell.Modules.Editors.Views
 
         private bool IsLineCommented(DocumentLine line)
         {
-            var lineText = textEditor.Document.GetText(line.Offset, line.Length);
+            var lineText = TextEditor.Document.GetText(line.Offset, line.Length);
             var trimmed = lineText.Trim();
             return trimmed.IndexOf("//",0).Equals(0);
         }

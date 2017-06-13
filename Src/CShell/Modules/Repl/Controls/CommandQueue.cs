@@ -8,20 +8,11 @@ namespace CShell.Modules.Repl.Controls
         private readonly int _limit;
         readonly ConcurrentQueue<T> _queue = new ConcurrentQueue<T>();
 
-        public int Count
-        {
-            get { return _queue.Count; }
-        }
+        public int Count => _queue.Count;
 
-        public T this[int i]
-        {
-            get { return _queue.ToArray()[i]; }
-        }
+        public T this[int i] => _queue.ToArray()[i];
 
-        public T[] ToArray()
-        {
-            return _queue.ToArray();
-        }
+        public T[] ToArray() => _queue.ToArray();
 
         public CommandQueue(int limit)
         {
@@ -40,11 +31,6 @@ namespace CShell.Modules.Repl.Controls
             
         }
 
-        public IEnumerable<T> Contents()
-        {
-            return _queue;
-        }
-
-
+        public IEnumerable<T> Contents() => _queue;
     }
 }

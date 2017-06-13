@@ -51,7 +51,7 @@ namespace CShell.Modules.Workspace.Views
                     if (binding != null)
                         property = binding.Path.Path;
 
-                    if(String.IsNullOrEmpty(property))
+                    if(string.IsNullOrEmpty(property))
                         property = headerClicked.Column.Header as string;
 
                     Sort(property, direction);

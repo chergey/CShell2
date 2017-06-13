@@ -18,11 +18,11 @@
 		<Setter Property="IsChecked" Value="{Binding IsChecked}" />
 	</Style>
 
-	<HierarchicalDataTemplate x:Key="menuTemplate" ItemsSource="{Binding Children}">
+	<HierarchicalDataTemplate x:Key="MenuTemplate" ItemsSource="{Binding Children}">
 		<ContentPresenter Content="{Binding Path=Text}" RecognizesAccessKey="True" />
 	</HierarchicalDataTemplate>
 
-    <DataTemplate x:Key="toolBarTemplate">
+    <DataTemplate x:Key="ToolBarTemplate">
         <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                             IsEnabled="{Binding CanExecute}"
                             ToolTip="{Binding Name}" 

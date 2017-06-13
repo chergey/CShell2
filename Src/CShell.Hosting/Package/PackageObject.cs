@@ -48,10 +48,7 @@ namespace CShell.Hosting.Package
 
         public IEnumerable<IPackageObject> Dependencies { get; set; }
 
-        public string FullName
-        {
-            get { return Id + "." + TextVersion; }
-        }
+        public string FullName => Id + "." + TextVersion;
 
         public IEnumerable<string> GetCompatibleDlls(FrameworkName frameworkName)
         {

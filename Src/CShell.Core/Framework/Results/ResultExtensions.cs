@@ -12,10 +12,7 @@ namespace CShell.Framework.Results
     /// </summary>
     public static class ResultExtensions
     {
-        public static void BeginExecute(this IEnumerable<IResult> results, CoroutineExecutionContext executionContext = null)
-        {
-            Coroutine.BeginExecute(results.GetEnumerator(), executionContext);
-        }
+        public static void BeginExecute(this IEnumerable<IResult> results, CoroutineExecutionContext executionContext = null) => Coroutine.BeginExecute(results.GetEnumerator(), executionContext);
 
         public static void BeginExecute(this IResult result, CoroutineExecutionContext executionContext = null)
         {

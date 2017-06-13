@@ -13,16 +13,16 @@ namespace CShell.Sinks.Grid
     /// </summary>
     public partial class GridSinkView : UserControl
     {
-        private Style rightAlignStyle;
-        private GridSinkViewModel gridSink;
-        private Type itemType;
+        private Style _rightAlignStyle;
+        private GridSinkViewModel _gridSink;
+        private Type _itemType;
 
         public GridSinkView()
         {
             InitializeComponent();
 
-            rightAlignStyle = new Style();
-            rightAlignStyle.Setters.Add(new Setter(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Right));
+            _rightAlignStyle = new Style();
+            _rightAlignStyle.Setters.Add(new Setter(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Right));
         }
 
         /// <summary>
@@ -32,14 +32,14 @@ namespace CShell.Sinks.Grid
         /// <param name="e">The <see cref="System.Windows.DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
         private void Data_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (gridSink != null)
-                gridSink.PropertyChanged -= vm_PropertyChanged;
+            if (_gridSink != null)
+                _gridSink.PropertyChanged -= vm_PropertyChanged;
 
-            gridSink = this.DataContext as GridSinkViewModel;
-            if(gridSink != null)
+            _gridSink = this.DataContext as GridSinkViewModel;
+            if(_gridSink != null)
             {
-                gridSink.PropertyChanged += vm_PropertyChanged;
-                if(gridSink.Data != null)
+                _gridSink.PropertyChanged += vm_PropertyChanged;
+                if(_gridSink.Data != null)
                     InitializeColumns();
             }
         }
@@ -48,7 +48,7 @@ namespace CShell.Sinks.Grid
         {
             if (e.PropertyName == "Data")
             {
-                if(itemType == null || itemType != gridSink.ItemType)
+                if(_itemType == null || _itemType != _gridSink.ItemType)
                     InitializeColumns();
             }
         }
@@ -66,10 +66,10 @@ namespace CShell.Sinks.Grid
         private void InitializeColumns()
         {
             Data.Columns.Clear();
-            if (gridSink.ItemType != null && gridSink.SelectedProperties != null)
+            if (_gridSink.ItemType != null && _gridSink.SelectedProperties != null)
             {
-                itemType = gridSink.ItemType;
-                foreach (var property in gridSink.SelectedProperties)
+                _itemType = _gridSink.ItemType;
+                foreach (var property in _gridSink.SelectedProperties)
                     AddColumn(property);
             }
         }
@@ -96,7 +96,7 @@ namespace CShell.Sinks.Grid
                 //if it's a percent property use % formatting.
                 if (propertyInfo.Name.ToLower().Contains("percent") || propertyInfo.Name.ToLower().Contains("prc"))
                     column.Binding.StringFormat = "{0:0.00%}";
-                column.ElementStyle = rightAlignStyle;
+                column.ElementStyle = _rightAlignStyle;
             }
 
             if (propertyInfo.PropertyType == typeof(int) ||
@@ -111,9 +111,9 @@ namespace CShell.Sinks.Grid
 
         private int GetColumnIndex(PropertyInfo propertyInfo)
         {
-            return gridSink.Properties
+            return _gridSink.Properties
                 .TakeWhile(itemProperty => propertyInfo != itemProperty)
-                .Count(itemProperty => gridSink.SelectedProperties.Contains(itemProperty));
+                .Count(itemProperty => _gridSink.SelectedProperties.Contains(itemProperty));
         }
 
         private void RemoveColumn(PropertyInfo propertyInfo)

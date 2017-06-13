@@ -11,7 +11,7 @@ namespace CShell.Modules.Workspace.ViewModels
 {
     public class FolderRootViewModel : FolderViewModel
     {
-        private FileSystemWatcher fileSystemWatcher;
+        private FileSystemWatcher _fileSystemWatcher;
 
         public FolderRootViewModel(string path, CShell.Workspace workspace)
             :base(path, workspace)
@@ -27,26 +27,26 @@ namespace CShell.Modules.Workspace.ViewModels
         private void Initialize()
         {
             //Workspace.PropertyChanged += WorkspaceOnPropertyChanged;
-            fileSystemWatcher = new FileSystemWatcher();
+            _fileSystemWatcher = new FileSystemWatcher();
 
-            fileSystemWatcher.Path = directoryInfo.FullName;
-            fileSystemWatcher.IncludeSubdirectories = true;
+            _fileSystemWatcher.Path = directoryInfo.FullName;
+            _fileSystemWatcher.IncludeSubdirectories = true;
 
             // Add event handlers.
-            fileSystemWatcher.Changed += OnChanged;
-            fileSystemWatcher.Created += OnChanged;
-            fileSystemWatcher.Deleted += OnChanged;
-            fileSystemWatcher.Renamed += OnRenamed;
+            _fileSystemWatcher.Changed += OnChanged;
+            _fileSystemWatcher.Created += OnChanged;
+            _fileSystemWatcher.Deleted += OnChanged;
+            _fileSystemWatcher.Renamed += OnRenamed;
 
             // Begin watching.
-            fileSystemWatcher.EnableRaisingEvents = true;
+            _fileSystemWatcher.EnableRaisingEvents = true;
         }
 
         private void WorkspaceOnPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             if (args.PropertyName == "RootFolder")
             {
-                fileSystemWatcher.EnableRaisingEvents = false;
+                _fileSystemWatcher.EnableRaisingEvents = false;
                 directoryInfo = new DirectoryInfo(Workspace.WorkspaceDirectory);
                 DisplayName = directoryInfo.FullName;
 
@@ -56,8 +56,8 @@ namespace CShell.Modules.Workspace.ViewModels
                 NotifyOfPropertyChange(() => ToolTip);
                 NotifyOfPropertyChange(() => RelativePath);
 
-                fileSystemWatcher.Path = directoryInfo.FullName;
-                fileSystemWatcher.EnableRaisingEvents = true;
+                _fileSystemWatcher.Path = directoryInfo.FullName;
+                _fileSystemWatcher.EnableRaisingEvents = true;
             }
             if(args.PropertyName == "Filter")
             {

@@ -11,10 +11,7 @@ namespace CShell.Sinks.Xhtml
     {
         public const string XhtmlSinkUri = "sink://cshell/xhtml/";
 
-        public static ISink GetXhtmlSink(string sinkName)
-        {
-            return GetXhtmlSink(sinkName, false);
-        }
+        public static ISink GetXhtmlSink(string sinkName) => GetXhtmlSink(sinkName, false);
 
         public static ISink GetXhtmlSink(string sinkName, bool suppressOpen)
         {

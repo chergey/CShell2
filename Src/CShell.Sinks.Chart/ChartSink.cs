@@ -25,20 +25,14 @@ namespace CShell.Sinks.Charting
         /// <summary>
         /// Gets the available plot chart types.
         /// </summary>
-        public static string[] SeriesChartTypes
-        {
-            get { return Enum.GetNames(typeof(SeriesChartType)); }
-        }
+        public static string[] SeriesChartTypes => Enum.GetNames(typeof(SeriesChartType));
 
         /// <summary>
         /// Gets a chart sink.
         /// If the chart exists or can be created the plot is opened.
         /// </summary>
         /// <param name="sinkName">Name of the sink.</param>
-        public static ISink GetChartSink(string sinkName)
-        {
-            return GetChartSink(sinkName, false);
-        }
+        public static ISink GetChartSink(string sinkName) => GetChartSink(sinkName, false);
 
         /// <summary>
         /// Gets a chart sink.
@@ -250,7 +244,7 @@ namespace CShell.Sinks.Charting
                 values is IEnumerable<ulong> ||
                 values is IEnumerable<short> ||
                 values is IEnumerable<ushort> ||
-                values is IEnumerable<String> ||
+                values is IEnumerable<string> ||
                 values is IEnumerable<DateTime>)
             {
                 isNested = false;

@@ -7,16 +7,13 @@ namespace CShell.Framework.Services
 {
     public static class Execute
     {
-        public static void OnUIThread(this Action action)
-        {
-            Caliburn.Micro.Execute.OnUIThread(action);
-        }
+        public static void OnUiThread(this Action action) => Caliburn.Micro.Execute.OnUIThread(action);
 
         /// <summary>
         /// Executes an action and marshals any exceptions that occur to the calling thread.
         /// </summary>
         /// <param name="action">The action.</param>
-        public static void OnUIThreadEx(this Action action)
+        public static void OnUiThreadEx(this Action action)
         {
             Exception exception = null;
             Caliburn.Micro.Execute.OnUIThread(()=>

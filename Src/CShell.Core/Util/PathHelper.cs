@@ -8,11 +8,11 @@ namespace CShell.Util
 {
     public static class PathHelper
     {
-        public static String ToAbsolutePath(String fromPath, String toPath)
+        public static string ToAbsolutePath(string fromPath, string toPath)
         {
-            if (String.IsNullOrEmpty(toPath))
+            if (string.IsNullOrEmpty(toPath))
                 return null;
-            if (String.IsNullOrEmpty(fromPath))
+            if (string.IsNullOrEmpty(fromPath))
                 return toPath;
 
             Uri path2 = new Uri(toPath, UriKind.RelativeOrAbsolute);
@@ -30,11 +30,11 @@ namespace CShell.Util
         /// <param name="toPath">Contains the path that defines the endpoint of the relative path.</param>
         /// <returns>The relative path from the start directory to the end path.</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public static String ToRelativePath(String fromPath, String toPath)
+        public static string ToRelativePath(string fromPath, string toPath)
         {
-            if (String.IsNullOrEmpty(toPath))
+            if (string.IsNullOrEmpty(toPath))
                 return null;
-            if (String.IsNullOrEmpty(fromPath))
+            if (string.IsNullOrEmpty(fromPath))
                 return toPath;
 
             Uri uri1 = new Uri(toPath, UriKind.RelativeOrAbsolute);

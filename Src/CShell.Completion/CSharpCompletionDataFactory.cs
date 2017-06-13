@@ -14,30 +14,24 @@ namespace CShell.Completion
 {
     sealed class CSharpCompletionDataFactory : ICompletionDataFactory, IParameterCompletionDataFactory
     {
-        readonly CSharpTypeResolveContext contextAtCaret;
-        private readonly CSharpCompletionContext context;
+        readonly CSharpTypeResolveContext _contextAtCaret;
+        private readonly CSharpCompletionContext _context;
 
         public CSharpCompletionDataFactory(CSharpTypeResolveContext contextAtCaret, CSharpCompletionContext context)
         {
             Debug.Assert(contextAtCaret != null);
-            this.contextAtCaret = contextAtCaret;
-            this.context = context;
+            this._contextAtCaret = contextAtCaret;
+            this._context = context;
         }
 
         #region ICompletionDataFactory implementation
-        ICompletionData ICompletionDataFactory.CreateEntityCompletionData(IEntity entity)
-        {
-            return new EntityCompletionData(entity);
-        }
+        ICompletionData ICompletionDataFactory.CreateEntityCompletionData(IEntity entity) => new EntityCompletionData(entity);
 
-        ICompletionData ICompletionDataFactory.CreateEntityCompletionData(IEntity entity, string text)
+        ICompletionData ICompletionDataFactory.CreateEntityCompletionData(IEntity entity, string text) => new EntityCompletionData(entity)
         {
-            return new EntityCompletionData(entity)
-            {
-                CompletionText = text,
-                DisplayText = text
-            };
-        }
+            CompletionText = text,
+            DisplayText = text
+        };
 
         ICompletionData ICompletionDataFactory.CreateTypeCompletionData(IType type, bool showFullName, bool isInAttributeContext, bool addForTypeCreation)
         {
@@ -55,54 +49,30 @@ namespace CShell.Completion
             }
         }
 
-        ICompletionData ICompletionDataFactory.CreateMemberCompletionData(IType type, IEntity member)
-        {
-            return new CompletionData(type.Name + "." + member.Name);
-        }
+        ICompletionData ICompletionDataFactory.CreateMemberCompletionData(IType type, IEntity member) => new CompletionData(type.Name + "." + member.Name);
 
-        ICompletionData ICompletionDataFactory.CreateLiteralCompletionData(string title, string description, string insertText)
+        ICompletionData ICompletionDataFactory.CreateLiteralCompletionData(string title, string description, string insertText) => new CompletionData(title)
         {
-            return new CompletionData(title)
-            {
-                Description = description,
-                CompletionText = insertText ?? title,
-                Image = CompletionImage.Literal.BaseImage,
-                Priority = 2
-            };
-        }
+            Description = description,
+            CompletionText = insertText ?? title,
+            Image = CompletionImage.Literal.BaseImage,
+            Priority = 2
+        };
 
-        ICompletionData ICompletionDataFactory.CreateNamespaceCompletionData(INamespace name)
+        ICompletionData ICompletionDataFactory.CreateNamespaceCompletionData(INamespace name) => new CompletionData(name.Name)
         {
-            return new CompletionData(name.Name)
-            {
-                Image = CompletionImage.NamespaceImage,
-            };
-        }
+            Image = CompletionImage.NamespaceImage,
+        };
 
-        ICompletionData ICompletionDataFactory.CreateVariableCompletionData(IVariable variable)
-        {
-            return new VariableCompletionData(variable);
-        }
+        ICompletionData ICompletionDataFactory.CreateVariableCompletionData(IVariable variable) => new VariableCompletionData(variable);
 
-        ICompletionData ICompletionDataFactory.CreateVariableCompletionData(ITypeParameter parameter)
-        {
-            return new CompletionData(parameter.Name);
-        }
+        ICompletionData ICompletionDataFactory.CreateVariableCompletionData(ITypeParameter parameter) => new CompletionData(parameter.Name);
 
-        ICompletionData ICompletionDataFactory.CreateEventCreationCompletionData(string varName, IType delegateType, IEvent evt, string parameterDefinition, IUnresolvedMember currentMember, IUnresolvedTypeDefinition currentType)
-        {
-            return new CompletionData("TODO: event creation");
-        }
+        ICompletionData ICompletionDataFactory.CreateEventCreationCompletionData(string varName, IType delegateType, IEvent evt, string parameterDefinition, IUnresolvedMember currentMember, IUnresolvedTypeDefinition currentType) => new CompletionData("TODO: event creation");
 
-        ICompletionData ICompletionDataFactory.CreateNewOverrideCompletionData(int declarationBegin, IUnresolvedTypeDefinition type, IMember m)
-        {
-            return new OverrideCompletionData(declarationBegin, m, contextAtCaret);
-        }
+        ICompletionData ICompletionDataFactory.CreateNewOverrideCompletionData(int declarationBegin, IUnresolvedTypeDefinition type, IMember m) => new OverrideCompletionData(declarationBegin, m, _contextAtCaret);
 
-        ICompletionData ICompletionDataFactory.CreateNewPartialCompletionData(int declarationBegin, IUnresolvedTypeDefinition type, IUnresolvedMember m)
-        {
-            return new CompletionData("TODO: partial completion");
-        }
+        ICompletionData ICompletionDataFactory.CreateNewPartialCompletionData(int declarationBegin, IUnresolvedTypeDefinition type, IUnresolvedMember m) => new CompletionData("TODO: partial completion");
 
         IEnumerable<ICompletionData> ICompletionDataFactory.CreateCodeTemplateCompletionData()
         {
@@ -119,7 +89,7 @@ namespace CShell.Completion
         {
             ITypeDefinition typeDef = type.GetDefinition();
             if (typeDef != null)
-                return new ImportCompletionData(typeDef, contextAtCaret, useFullName);
+                return new ImportCompletionData(typeDef, _contextAtCaret, useFullName);
             else
                 throw new InvalidOperationException("Should never happen");
         }
@@ -136,30 +106,15 @@ namespace CShell.Completion
         #endregion
 
         #region IParameterCompletionDataFactory implementation
-        IParameterDataProvider CreateMethodDataProvider(int startOffset, IEnumerable<IParameterizedMember> methods)
-        {
-            return new CSharpOverloadProvider(context, startOffset, from m in methods where m != null select new CSharpInsightItem(m));
-        }
+        IParameterDataProvider CreateMethodDataProvider(int startOffset, IEnumerable<IParameterizedMember> methods) => new CSharpOverloadProvider(_context, startOffset, from m in methods where m != null select new CSharpInsightItem(m));
 
-        IParameterDataProvider IParameterCompletionDataFactory.CreateConstructorProvider(int startOffset, IType type)
-        {
-            return CreateMethodDataProvider(startOffset, type.GetConstructors());
-        }
+        IParameterDataProvider IParameterCompletionDataFactory.CreateConstructorProvider(int startOffset, IType type) => CreateMethodDataProvider(startOffset, type.GetConstructors());
 
-        IParameterDataProvider IParameterCompletionDataFactory.CreateConstructorProvider(int startOffset, IType type, AstNode thisInitializer)
-        {
-            return CreateMethodDataProvider(startOffset, type.GetConstructors());
-        }
+        IParameterDataProvider IParameterCompletionDataFactory.CreateConstructorProvider(int startOffset, IType type, AstNode thisInitializer) => CreateMethodDataProvider(startOffset, type.GetConstructors());
 
-        IParameterDataProvider IParameterCompletionDataFactory.CreateMethodDataProvider(int startOffset, IEnumerable<IMethod> methods)
-        {
-            return CreateMethodDataProvider(startOffset, methods);
-        }
+        IParameterDataProvider IParameterCompletionDataFactory.CreateMethodDataProvider(int startOffset, IEnumerable<IMethod> methods) => CreateMethodDataProvider(startOffset, methods);
 
-        IParameterDataProvider IParameterCompletionDataFactory.CreateDelegateDataProvider(int startOffset, IType type)
-        {
-            return CreateMethodDataProvider(startOffset, new[] { type.GetDelegateInvokeMethod() });
-        }
+        IParameterDataProvider IParameterCompletionDataFactory.CreateDelegateDataProvider(int startOffset, IType type) => CreateMethodDataProvider(startOffset, new[] { type.GetDelegateInvokeMethod() });
 
         public IParameterDataProvider CreateIndexerParameterDataProvider(int startOffset, IType type, IEnumerable<IProperty> accessibleIndexers, AstNode resolvedNode)
         {
@@ -167,15 +122,10 @@ namespace CShell.Completion
             //return CreateMethodDataProvider(startOffset, accessibleIndexers);
         }
 
-        IParameterDataProvider IParameterCompletionDataFactory.CreateTypeParameterDataProvider(int startOffset, IEnumerable<IType> types)
-        {
-            return null;
-        }
+        IParameterDataProvider IParameterCompletionDataFactory.CreateTypeParameterDataProvider(int startOffset, IEnumerable<IType> types) => null;
 
-        public IParameterDataProvider CreateTypeParameterDataProvider(int startOffset, IEnumerable<IMethod> methods)
-        {
-            return CreateMethodDataProvider(startOffset, methods);
-        }
+        public IParameterDataProvider CreateTypeParameterDataProvider(int startOffset, IEnumerable<IMethod> methods) => CreateMethodDataProvider(startOffset, methods);
+
         #endregion
 
     }

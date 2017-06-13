@@ -29,22 +29,13 @@ namespace CShell.Modules.Repl.ViewModels
             DisplayName = "Output";
         }
 
-		public override PaneLocation PreferredLocation
-		{
-			get { return PaneLocation.Bottom; }
-		}
+		public override PaneLocation PreferredLocation => PaneLocation.Bottom;
 
-        public override Uri Uri
-        {
-            get { return new Uri("tool://cshell/output"); }
-        }
+        public override Uri Uri => new Uri("tool://cshell/output");
 
-        public override Uri IconSource
-        {
-            get { return new Uri("pack://application:,,,/CShell;component/Resources/Icons/Output.png"); }
-        }
+        public override Uri IconSource => new Uri("pack://application:,,,/CShell;component/Resources/Icons/Output.png");
 
-		private string _text = string.Empty;
+        private string _text = string.Empty;
 		public string Text
 		{
 			get { return _text; }
@@ -55,25 +46,25 @@ namespace CShell.Modules.Repl.ViewModels
                 {
                     var lines = _text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
                     //only remove old lines every 10 updates 
-                    if (lines.Length > BufferLength && (bufferLength <= 10 || lines.Length % 10 == 0))
-                        _text = String.Join(Environment.NewLine, lines.Skip(lines.Length - bufferLength));
+                    if (lines.Length > BufferLength && (_bufferLength <= 10 || lines.Length % 10 == 0))
+                        _text = string.Join(Environment.NewLine, lines.Skip(lines.Length - _bufferLength));
                 }
 			    NotifyOfPropertyChange(() => Text);
 
 				if (_view != null)
-					Execute.OnUIThread(() => _view.ScrollToEnd());
+					Execute.OnUiThread(() => _view.ScrollToEnd());
 			}
 		}
 
-	    private int bufferLength;
+	    private int _bufferLength;
 	    public int BufferLength
 	    {
-	        get { return bufferLength; }
+	        get { return _bufferLength; }
 	        set
 	        {
                 if (value <= 0)
                     throw new ArgumentException("BufferLength has to be 1 or greater");
-                bufferLength = value;
+                _bufferLength = value;
 	        }
 	    }
 
@@ -99,12 +90,12 @@ namespace CShell.Modules.Repl.ViewModels
 
         public void Write(string format, params object[] arg)
         {
-            Text += String.Format(format, arg);
+            Text += string.Format(format, arg);
         }
 
         public void WriteLine(string format, params object[] arg)
         {
-            Text += String.Format(format, arg) + Environment.NewLine;
+            Text += string.Format(format, arg) + Environment.NewLine;
         }
 
 		protected override void OnViewLoaded(object view)
@@ -114,52 +105,47 @@ namespace CShell.Modules.Repl.ViewModels
 		}
 
         #region Appearance from IOutput
-        private string font;
+        private string _font;
         public string Font
         {
-            get { return font; }
-            set { font = value; NotifyOfPropertyChange(() => Font); }
+            get { return _font; }
+            set { _font = value; NotifyOfPropertyChange(() => Font); }
         }
 
-        private double fontSize;
+        private double _fontSize;
         public double FontSize
         {
-            get { return fontSize; }
-            set { fontSize = value; NotifyOfPropertyChange(() => FontSize); }
+            get { return _fontSize; }
+            set { _fontSize = value; NotifyOfPropertyChange(() => FontSize); }
         }
 
-        private Color textColor;
+        private Color _textColor;
         public Color TextColor
         {
-            get { return textColor; }
+            get { return _textColor; }
             set
             {
-                textColor = value;
+                _textColor = value;
                 NotifyOfPropertyChange(() => TextColor);
                 NotifyOfPropertyChange(() => TextBrush);
             }
         }
-        public Brush TextBrush
-        {
-            get { return new SolidColorBrush(TextColor); }
-        }
+        public Brush TextBrush => new SolidColorBrush(TextColor);
 
-        private Color backgroundColor;
+        private Color _backgroundColor;
         public Color BackgroundColor
         {
-            get { return backgroundColor; }
+            get { return _backgroundColor; }
             set
             {
-                backgroundColor = value;
+                _backgroundColor = value;
                 NotifyOfPropertyChange(() => BackgroundColor);
                 NotifyOfPropertyChange(() => BackgroundBrush);
 
             }
         }
-        public Brush BackgroundBrush
-        {
-            get { return new SolidColorBrush(BackgroundColor); }
-        }
+        public Brush BackgroundBrush => new SolidColorBrush(BackgroundColor);
+
         #endregion
 
         

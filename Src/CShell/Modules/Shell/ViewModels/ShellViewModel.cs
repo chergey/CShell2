@@ -29,9 +29,9 @@ namespace CShell.Modules.Shell.ViewModels
 	[Export(typeof(IShell))]
 	public class ShellViewModel : Conductor<IScreen>.Collection.OneActive, IShell
 	{
-	    private bool closing = false;
-	    private IShellView shellView;
-        private readonly ILog log = LogManager.GetLog(typeof(IShell));
+	    private bool _closing = false;
+	    private IShellView _shellView;
+        private readonly ILog _log = LogManager.GetLog(typeof(IShell));
 
         public ShellViewModel()
         {
@@ -44,7 +44,7 @@ namespace CShell.Modules.Shell.ViewModels
             this.StatusBar.UpdateMessage("Ready");
             this.StatusBar.UpdateProgress(false);
             //this.Icon = _resourceManager.GetBitmap("Icon.ico", Assembly.GetExecutingAssembly().GetAssemblyName());
-            shellView = view as IShellView;
+            _shellView = view as IShellView;
             base.OnViewLoaded(view);
         }
 
@@ -73,40 +73,24 @@ namespace CShell.Modules.Shell.ViewModels
 
 		[Import]
 		private IMenu _mainMenu;
-		public IMenu MainMenu
-		{
-			get { return _mainMenu; }
-		}
+		public IMenu MainMenu => _mainMenu;
 
-        [Import]
+	    [Import]
         private IToolBar _toolBar;
-        public IToolBar ToolBar
-        {
-            get { return _toolBar; }
-        }
+        public IToolBar ToolBar => _toolBar;
 
-		[Import]
+	    [Import]
 		private IStatusBar _statusBar;
-		public IStatusBar StatusBar
-		{
-			get { return _statusBar; }
-		}
+		public IStatusBar StatusBar => _statusBar;
 
-		private readonly BindableCollection<ITool> _tools;
-        public IObservableCollection<ITool> ToolsObservable
-        {
-            get { return _tools; }
-        }
-		public IEnumerable<ITool> Tools
-		{
-			get { return _tools; }
-		}
+	    private readonly BindableCollection<ITool> _tools;
+        public IObservableCollection<ITool> ToolsObservable => _tools;
 
-        public IEnumerable<IDocument> Documents
-        {
-            get { return Items.Where(item => item is IDocument).Cast<IDocument>(); }
-        }
-        #endregion
+	    public IEnumerable<ITool> Tools => _tools;
+
+	    public IEnumerable<IDocument> Documents => Items.Where(item => item is IDocument).Cast<IDocument>();
+
+	    #endregion
 
         #region Documents & Tools
         public void ShowTool(ITool model)
@@ -117,21 +101,13 @@ namespace CShell.Modules.Shell.ViewModels
                 ToolsObservable.Add(model);
 		}
 
-		public void OpenDocument(IDocument model)
-		{
-			ActivateItem(model);
-		}
+		public void OpenDocument(IDocument model) => ActivateItem(model);
 
-		public void ActivateDocument(IDocument document)
-		{
-			ActivateItem(document);
-		}
+	    public void ActivateDocument(IDocument document) => ActivateItem(document);
 
-        public void CloseDocument(IDocument document)
-        {
-            DeactivateItem(document, true);
-        }
-        #endregion
+	    public void CloseDocument(IDocument document) => DeactivateItem(document, true);
+
+	    #endregion
 
         #region Open & Close the App
         public void Opened(string[] args)
@@ -155,12 +131,9 @@ namespace CShell.Modules.Shell.ViewModels
             }
         }
 
-	    public void Close()
-		{
-			Application.Current.MainWindow.Close();
-		}
+	    public void Close() => Application.Current.MainWindow.Close();
 
-        protected override void OnDeactivate(bool close)
+	    protected override void OnDeactivate(bool close)
         {
             //for some reason, this sometimes crashes when the app is closed, we can actually disregard it, but for now it's looged to see when it happens
             try
@@ -179,10 +152,10 @@ namespace CShell.Modules.Shell.ViewModels
             // for the async close process to have enough time BEFORE the app closes we need to first cancel the close 
             // and then continue once the closing of the workspace is complete, and all of this in an async matter.
             // TODO: check if there are any unsaved documents and handle that properly first.
-            if (!closing)
+            if (!_closing)
             {
                 e.Cancel = true;
-                closing = true;
+                _closing = true;
                 yield return new ChangeWorkspaceResult(null);
                 yield return new CloseShellResult();
             }
@@ -192,11 +165,11 @@ namespace CShell.Modules.Shell.ViewModels
         #region Save & Load Layout
         public void SaveLayout(XmlWriter xmlWriter)
         {
-            if(shellView != null && shellView.DockingManager != null)
+            if(_shellView != null && _shellView.DockingManager != null)
             {
-                Execute.OnUIThreadEx(() =>
+                Execute.OnUiThreadEx(() =>
                 {
-                    var layoutSerializer = new XmlLayoutSerializer(shellView.DockingManager);
+                    var layoutSerializer = new XmlLayoutSerializer(_shellView.DockingManager);
                     layoutSerializer.Serialize(xmlWriter);
                 });
             }
@@ -204,17 +177,18 @@ namespace CShell.Modules.Shell.ViewModels
 
         public void LoadLayout(XmlReader xmlReader)
         {
-            if (shellView != null && shellView.DockingManager != null)
+            if (_shellView != null && _shellView.DockingManager != null)
             {
-                Execute.OnUIThreadEx(() =>
+                Execute.OnUiThreadEx(() =>
                 {
-                    var layoutSerializer = new XmlLayoutSerializer(shellView.DockingManager);
+                    var layoutSerializer = new XmlLayoutSerializer(_shellView.DockingManager);
                     //Here I've implemented the LayoutSerializationCallback just to show
                     // a way to feed layout desarialization with content loaded at runtime
                     //Actually I could in this case let AvalonDock to attach the contents
                     //from current layout using the content ids
                     //LayoutSerializationCallback should anyway be handled to attach contents
                     //not currently loaded
+                    var tempLayout = layoutSerializer.Manager.Layout;
                     layoutSerializer.LayoutSerializationCallback += (s, e) =>
                     {
                         var contentId = e.Model.ContentId;
@@ -249,22 +223,18 @@ namespace CShell.Modules.Shell.ViewModels
                     {
                         //no big deal if the layout cannot be restored, there can be a few reasons, we just log the error and move on
                         // one reason is if there is no layout element in the xml
-                        log.Error(ex);
+                        _log.Error(ex);
+                        layoutSerializer.Manager.Layout = tempLayout;
                     }
                 });
             }
         }//end method
 
-        public CShell.Workspace.WindowLocation GetWindowLocation()
-        {
-            return shellView.GetWindowLocation();
-        }
+        public CShell.Workspace.WindowLocation GetWindowLocation() => _shellView.GetWindowLocation();
 
-        public void RestoreWindowLocation(CShell.Workspace.WindowLocation windowLocation)
-        {
-            shellView.RestoreWindowLocation(windowLocation);
-        }
-        #endregion
+	    public void RestoreWindowLocation(CShell.Workspace.WindowLocation windowLocation) => _shellView.RestoreWindowLocation(windowLocation);
+
+	    #endregion
 
 
 

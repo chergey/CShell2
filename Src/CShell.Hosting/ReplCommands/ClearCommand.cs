@@ -6,26 +6,20 @@ namespace CShell.Hosting.ReplCommands
 {
     public class ClearCommand : IReplCommand
     {
-        private readonly IReplOutput replOutput;
+        private readonly IReplOutput _replOutput;
 
         public ClearCommand(IReplOutput replOutput)
         {
-            this.replOutput = replOutput;
+            this._replOutput = replOutput;
         }
 
-        public string CommandName
-        {
-            get { return "clear"; }
-        }
+        public string CommandName => "clear";
 
-        public string Description
-        {
-            get { return "Clears all text from the REPL."; }
-        }
+        public string Description => "Clears all text from the REPL.";
 
         public object Execute(IRepl repl, object[] args)
         {
-            replOutput.Clear();
+            _replOutput.Clear();
             return null;
         }
     }

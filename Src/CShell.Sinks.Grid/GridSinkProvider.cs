@@ -11,10 +11,7 @@ namespace CShell.Sinks.Grid
     [Export(typeof(ISinkProvider))]
     public class GridSinkProvider : ISinkProvider
     {
-        public bool Handles(Uri uri)
-        {
-            return uri.Scheme == "sink" && uri.Host == "cshell";
-        }
+        public bool Handles(Uri uri) => uri.Scheme == "sink" && uri.Host == "cshell";
 
         /// <summary>
         /// Creates a CShell sink.

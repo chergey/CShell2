@@ -82,17 +82,18 @@ namespace CShell.Modules.Shell
 
 	    private IEnumerable<IResult> NewFile()
         {
-            var dialog = new SaveFileDialog();
-            dialog.Filter = CShell.Constants.FileTypes;
-            dialog.DefaultExt = CShell.Constants.DefaultExtension;
-            yield return Show.Dialog(dialog);
+	        var dialog = new SaveFileDialog
+	        {
+	            Filter = CShell.Constants.FileTypes,
+	            DefaultExt = CShell.Constants.DefaultExtension
+	        };
+	        yield return Show.Dialog(dialog);
             yield return Show.Document(dialog.FileName);
         }
 
         private IEnumerable<IResult> OpenFile()
         {
-            var dialog = new OpenFileDialog();
-            dialog.Filter = CShell.Constants.FileFilter;
+            var dialog = new OpenFileDialog {Filter = CShell.Constants.FileFilter};
             yield return Show.Dialog(dialog);
             yield return Show.Document(dialog.FileName);
         }

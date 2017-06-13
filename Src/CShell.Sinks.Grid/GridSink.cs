@@ -11,10 +11,7 @@ namespace CShell.Sinks.Grid
     {
         public const string GridSinkUri = "sink://cshell/grid/";
 
-        public static ISink GetGridSink(string sinkName)
-        {
-            return GetGridSink(sinkName, false);
-        }
+        public static ISink GetGridSink(string sinkName) => GetGridSink(sinkName, false);
 
         public static ISink GetGridSink(string sinkName, bool suppressOpen)
         {

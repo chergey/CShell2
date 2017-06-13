@@ -12,34 +12,28 @@ namespace CShell
 {
     public static partial class Shell
     {
-        private static Uri defaultSinkUri = new Uri("sink://cshell/xhtml/");
+        private static Uri _defaultSinkUri = new Uri("sink://cshell/xhtml/");
         /// <summary>
         /// Gets or sets the URI of the default sink.
         /// </summary>
         public static Uri DefaultSinkUri
         {
-            get { return defaultSinkUri; }
-            set { defaultSinkUri = value; }
+            get { return _defaultSinkUri; }
+            set { _defaultSinkUri = value; }
         }
 
         /// <summary>
         /// Gets all available sinks.
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<ISink> GetSinks()
-        {
-            return UI.Documents.OfType<ISink>().ToArray();
-        }
+        public static IEnumerable<ISink> GetSinks() => Ui.Documents.OfType<ISink>().ToArray();
 
         /// <summary>
         /// Gets a specific sink based on the URI. 
         /// If the sink URI exists or can be created the sink is opened.
         /// </summary>
         /// <param name="uri">The sink URI.</param>
-        public static ISink GetSink(Uri uri)
-        {
-            return GetSink(uri, false);
-        }
+        public static ISink GetSink(Uri uri) => GetSink(uri, false);
 
         /// <summary>
         /// Gets a specific sink based on the uri.
@@ -49,7 +43,7 @@ namespace CShell
         /// <returns></returns>
         public static ISink GetSink(Uri uri, bool suppressOpen)
         {
-            if (uri == null) throw new ArgumentNullException("uri");
+            if (uri == null) throw new ArgumentNullException(nameof(uri));
             var sinks = GetSinks();
             var sink = sinks.FirstOrDefault(s => s.Uri == uri);
             if (sink == null)
@@ -61,7 +55,7 @@ namespace CShell
                     .FirstOrDefault(s => s != null);
 
                 if (sink != null && !suppressOpen)
-                    UI.ActivateDocument(sink);
+                    Ui.ActivateDocument(sink);
             }
             return sink;
         }
@@ -73,7 +67,7 @@ namespace CShell
         /// <returns>If the sink name cannot be found returns null.</returns>
         public static ISink GetSink(string sinkName)
         {
-            if (sinkName == null) throw new ArgumentNullException("sinkName");
+            if (sinkName == null) throw new ArgumentNullException(nameof(sinkName));
 
             var sinks = GetSinks();
             var sink = sinks.FirstOrDefault(s => s.DisplayName.Equals(sinkName));

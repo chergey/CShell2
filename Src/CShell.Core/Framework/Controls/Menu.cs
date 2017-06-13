@@ -12,9 +12,6 @@ namespace CShell.Framework.Controls
 			return base.IsItemItsOwnContainerOverride(item);
 		}
 
-		protected override DependencyObject GetContainerForItemOverride()
-		{
-			return MenuItem.GetContainer(this, _currentItem);
-		}
+		protected override DependencyObject GetContainerForItemOverride() => MenuItem.GetContainer(this, _currentItem);
 	}
 }

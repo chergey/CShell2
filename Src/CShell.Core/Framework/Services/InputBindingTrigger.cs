@@ -28,18 +28,11 @@ namespace CShell.Framework.Services
 		}
 
 		#region ICommand Members
-		public bool CanExecute(object parameter)
-		{
-			// action is anyway blocked by Caliburn at the invoke level
-			return true;
-		}
-		public event EventHandler CanExecuteChanged = delegate { };
+		public bool CanExecute(object parameter) => true;
+	    public event EventHandler CanExecuteChanged = delegate { };
 
-		public void Execute(object parameter)
-		{
-			InvokeActions(parameter);
-		}
+		public void Execute(object parameter) => InvokeActions(parameter);
 
-		#endregion
+	    #endregion
 	}
 }

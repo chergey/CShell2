@@ -14,11 +14,11 @@ namespace CShell.Modules.Workspace.ViewModels
 {
     public class AssemblyReferencesViewModel : TreeViewModel
     {
-        private readonly IReplScriptExecutor replExecutor;
+        private readonly IReplScriptExecutor _replExecutor;
 
         public AssemblyReferencesViewModel(IReplScriptExecutor replExecutor)
         {
-            this.replExecutor = replExecutor;
+            this._replExecutor = replExecutor;
             DisplayName = "Loaded References";
 
             replExecutor.AssemblyReferencesChanged += ReplExecutorOnAssemblyReferencesChanged;
@@ -29,21 +29,18 @@ namespace CShell.Modules.Workspace.ViewModels
         {
             Children.Clear();
             var refs = new List<AssemblyReferenceViewModel>();
-            refs.AddRange(replExecutor.GetReferencesAsPaths().Select(path=>new AssemblyReferenceViewModel(path, replExecutor)));
+            refs.AddRange(_replExecutor.GetReferencesAsPaths().Select(path=>new AssemblyReferenceViewModel(path, _replExecutor)));
             refs = refs.OrderBy(refVm => refVm.DisplayName).ToList();
             Children.AddRange(refs);
         }
 
-        private void ReplExecutorOnAssemblyReferencesChanged(object sender, EventArgs eventArgs)
-        {
-            Reload();
-        }
+        private void ReplExecutorOnAssemblyReferencesChanged(object sender, EventArgs eventArgs) => Reload();
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                replExecutor.AssemblyReferencesChanged -= ReplExecutorOnAssemblyReferencesChanged;
+                _replExecutor.AssemblyReferencesChanged -= ReplExecutorOnAssemblyReferencesChanged;
             }
             base.Dispose(disposing);
         }
@@ -59,25 +56,12 @@ namespace CShell.Modules.Workspace.ViewModels
             }
         }
 
-        public IEnumerable<IResult> AddFileReferences()
-        {
-            return Module.AddFileReferences();
-        }
+        public IEnumerable<IResult> AddFileReferences() => Module.AddFileReferences();
 
-        public IEnumerable<IResult> AddGacReferences()
-        {
-            return Module.AddGacReferences();
-        }
+        public IEnumerable<IResult> AddGacReferences() => Module.AddGacReferences();
 
-        public IEnumerable<IResult> CopyReferences()
-        {
-            return Module.CopyReferences();
-        }
+        public IEnumerable<IResult> CopyReferences() => Module.CopyReferences();
 
-        public IEnumerable<IResult> MangePackages()
-        {
-            return Module.MangePackages();
-        }
-
+        public IEnumerable<IResult> MangePackages() => Module.MangePackages();
     }//end class
 }

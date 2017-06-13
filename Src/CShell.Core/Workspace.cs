@@ -17,46 +17,43 @@ namespace CShell
     [Export]
     public sealed partial class Workspace : PropertyChangedBase
     {
-        private readonly IShell shell;
-        private readonly IReplScriptExecutorFactory replExecutorFactory;
+        private readonly IShell _shell;
+        private readonly IReplScriptExecutorFactory _replExecutorFactory;
 
-        private IReplScriptExecutor replExecutor;
+        private IReplScriptExecutor _replExecutor;
 
         [ImportingConstructor]
         public Workspace(IShell shell, IReplScriptExecutorFactory replExecutorFactory)
         {
-            this.shell = shell;
-            this.replExecutorFactory = replExecutorFactory;
+            this._shell = shell;
+            this._replExecutorFactory = replExecutorFactory;
         }
 
-        public IReplScriptExecutor ReplExecutor
-        {
-            get { return replExecutor; }
-        }
+        public IReplScriptExecutor ReplExecutor => _replExecutor;
 
         public string WorkspaceDirectory { get; private set; }
 
 
         public void SetWorkspaceDirectory(string dir)
         {
-            if (!String.IsNullOrEmpty(WorkspaceDirectory))
+            if (!string.IsNullOrEmpty(WorkspaceDirectory))
             {
                 //try to save the layout
                 SaveLayout();
             }
 
-            if(replExecutor != null)
-                replExecutor.Reset();
+            if(_replExecutor != null)
+                _replExecutor.Reset();
 
-            replExecutor = null;
+            _replExecutor = null;
             WorkspaceDirectory = dir;
 
-            if (!String.IsNullOrEmpty(WorkspaceDirectory))
+            if (!string.IsNullOrEmpty(WorkspaceDirectory))
             {
                 WorkspaceDirectory = Path.GetFullPath(WorkspaceDirectory);
                 //create executor
                 //note: csx scripts for configuration and loading references is executed in the ReplScriptExecutor
-                replExecutor = replExecutorFactory.Create(WorkspaceDirectory);
+                _replExecutor = _replExecutorFactory.Create(WorkspaceDirectory);
                 //restore layout
                 LoadLayout();
             }

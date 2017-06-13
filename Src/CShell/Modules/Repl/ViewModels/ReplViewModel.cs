@@ -18,11 +18,11 @@ namespace CShell.Modules.Repl.ViewModels
     [Export(typeof(ITool))]
     public class ReplViewModel : Tool, IReplOutput
     {
-        private readonly Timer timer;
-        private IReplOutput internalReplOutput;
-        private IReplView replView;
+        private readonly Timer _timer;
+        private IReplOutput _internalReplOutput;
+        private IReplView _replView;
 
-        [Import] private IShell shell;
+        [Import] private IShell _shell;
 
         [ImportingConstructor]
         public ReplViewModel(IEventAggregator eventAggregator)
@@ -31,60 +31,50 @@ namespace CShell.Modules.Repl.ViewModels
 
             DisplayName = "C# Interactive";
 
-            timer = new Timer(100);
-            timer.AutoReset = true;
-            timer.Elapsed += TimerOnElapsed;
+            _timer = new Timer(100) {AutoReset = true};
+           // _timer.Elapsed += TimerOnElapsed;
         }
         
-        public override Uri IconSource
-        {
-            get { return new Uri("pack://application:,,,/CShell;component/Resources/Icons/Output.png"); }
-        }
+        public override Uri IconSource => new Uri("pack://application:,,,/CShell;component/Resources/Icons/Output.png");
 
-        public override PaneLocation PreferredLocation
-        {
-            get { return PaneLocation.Bottom; }
-        }
+        public override PaneLocation PreferredLocation => PaneLocation.Bottom;
 
-        public override Uri Uri
-        {
-            get { return new Uri("tool://cshell/repl"); }
-        }
+        public override Uri Uri => new Uri("tool://cshell/repl");
 
         protected override void OnViewLoaded(object view)
         {
-            replView = (IReplView) view;
-            internalReplOutput = replView.GetReplOutput();
+            _replView = (IReplView) view;
+            _internalReplOutput = _replView.GetReplOutput();
 
-            timer.Start();
+            _timer.Start();
             base.OnViewLoaded(view);
         }
 
         protected override void OnDeactivate(bool close)
         {
             if(close)
-                timer.Dispose();
+                _timer.Dispose();
         }
 
-        private DateTime lastTimeNoEvaluations;
+        private DateTime _lastTimeNoEvaluations;
         private void TimerOnElapsed(object sender, ElapsedEventArgs elapsedEventArgs)
         {
-            if(!internalReplOutput.IsEvaluating)
+            if(!_internalReplOutput.IsEvaluating)
             {
-                lastTimeNoEvaluations = DateTime.Now;
-                if(shell.StatusBar.Message != "Ready")
+                _lastTimeNoEvaluations = DateTime.Now;
+                if(_shell.StatusBar.Message != "Ready")
                 {
-                    shell.StatusBar.UpdateMessage();
-                    shell.StatusBar.UpdateProgress(false);
+                    _shell.StatusBar.UpdateMessage();
+                    _shell.StatusBar.UpdateProgress(false);
                 }
             }
             else
             {
-                var evaluatingTime = DateTime.Now - lastTimeNoEvaluations;
+                var evaluatingTime = DateTime.Now - _lastTimeNoEvaluations;
                 if(evaluatingTime.TotalSeconds > 0.5)
                 {
-                    shell.StatusBar.UpdateMessage("Running...");
-                    shell.StatusBar.UpdateProgress(true);
+                    _shell.StatusBar.UpdateMessage("Running...");
+                    _shell.StatusBar.UpdateProgress(true);
                 }
             }
         }
@@ -93,126 +83,114 @@ namespace CShell.Modules.Repl.ViewModels
         #region IRepl wrapper implementaion
         public void Initialize(IReplScriptExecutor replExecutor)
         {
-            Execute.OnUIThread(() => internalReplOutput.Initialize(replExecutor));
+            Execute.OnUiThread(() => _internalReplOutput.Initialize(replExecutor));
         }
 
         public void EvaluateStarted(string input, string sourceFile)
         {
-            Execute.OnUIThread(() => internalReplOutput.EvaluateStarted(input, sourceFile));
+            Execute.OnUiThread(() => _internalReplOutput.EvaluateStarted(input, sourceFile));
         }
 
         public void EvaluateCompleted(ScriptResult result)
         {
-            Execute.OnUIThread(() => internalReplOutput.EvaluateCompleted(result));
+            Execute.OnUiThread(() => _internalReplOutput.EvaluateCompleted(result));
         }
 
         public void Clear()
         {
-            Execute.OnUIThread(()=>internalReplOutput.Clear());
+            Execute.OnUiThread(()=>_internalReplOutput.Clear());
         }
 
-        public bool IsEvaluating
-        {
-            get { return internalReplOutput.IsEvaluating; }
-        }
+        public bool IsEvaluating => _internalReplOutput.IsEvaluating;
 
         public void Write(string value)
         {
-            Execute.OnUIThread(() => internalReplOutput.Write(value));
+            Execute.OnUiThread(() => _internalReplOutput.Write(value));
         }
 
         public void WriteLine()
         {
-            Execute.OnUIThread(() => internalReplOutput.WriteLine());
+            Execute.OnUiThread(() => _internalReplOutput.WriteLine());
         }
 
         public void WriteLine(string value)
         {
-            Execute.OnUIThread(() => internalReplOutput.WriteLine(value));
+            Execute.OnUiThread(() => _internalReplOutput.WriteLine(value));
         }
 
         public void Write(string format, params object[] arg)
         {
-            Execute.OnUIThread(() => internalReplOutput.Write(format, arg));
+            Execute.OnUiThread(() => _internalReplOutput.Write(format, arg));
         }
 
         public void WriteLine(string format, params object[] arg)
         {
-            Execute.OnUIThread(() => internalReplOutput.WriteLine(format, arg));
+            Execute.OnUiThread(() => _internalReplOutput.WriteLine(format, arg));
         }
 
         public int BufferLength
         {
-            get { return internalReplOutput.BufferLength; }
-            set { Execute.OnUIThread(() => internalReplOutput.BufferLength = value); }
+            get { return _internalReplOutput.BufferLength; }
+            set { Execute.OnUiThread(() => _internalReplOutput.BufferLength = value); }
         }
 
-        public IEnumerable<string> SuppressedWarnings
-        {
-            get { return internalReplOutput.SuppressedWarnings; }
-        }
+        public IEnumerable<string> SuppressedWarnings => _internalReplOutput.SuppressedWarnings;
 
-        public void SuppressWarning(string warningCode)
-        {
-            internalReplOutput.SuppressWarning(warningCode);
-        }
+        public void SuppressWarning(string warningCode) => _internalReplOutput.SuppressWarning(warningCode);
 
-        public void ShowWarning(string warningCode)
-        {
-            internalReplOutput.ShowWarning(warningCode);
-        }
+        public void ShowWarning(string warningCode) => _internalReplOutput.ShowWarning(warningCode);
 
         public void ResetColor()
         {
-            Execute.OnUIThread(() => internalReplOutput.ResetColor());
+            Execute.OnUiThread(() => _internalReplOutput.ResetColor());
         }
 
         public bool ShowConsoleOutput
         {
-            get { return internalReplOutput.ShowConsoleOutput; }
-            set { Execute.OnUIThread(()=>internalReplOutput.ShowConsoleOutput = value); }
+            get { return _internalReplOutput.ShowConsoleOutput; }
+            set { Execute.OnUiThread(()=>_internalReplOutput.ShowConsoleOutput = value); }
         }
 
         public string Font
         {
-            get { return internalReplOutput.Font; }
-            set { Execute.OnUIThread(()=>internalReplOutput.Font = value); }
+            get { return _internalReplOutput.Font; }
+            set { Execute.OnUiThread(()=>_internalReplOutput.Font = value); }
         }
 
         public double FontSize
         {
-            get { return internalReplOutput.FontSize; }
-            set { Execute.OnUIThread(()=>internalReplOutput.FontSize = value); }
+            get { return _internalReplOutput.FontSize; }
+            set { Execute.OnUiThread(()=>_internalReplOutput.FontSize = value); }
         }
 
         public System.Windows.Media.Color BackgroundColor
         {
-            get { return internalReplOutput.BackgroundColor; }
-            set { Execute.OnUIThread(()=>internalReplOutput.BackgroundColor = value); }
+            get { return _internalReplOutput.BackgroundColor; }
+            set { Execute.OnUiThread(()=>_internalReplOutput.BackgroundColor = value); }
         }
 
         public System.Windows.Media.Color ResultColor
         {
-            get { return internalReplOutput.ResultColor; }
-            set { Execute.OnUIThread(()=>internalReplOutput.ResultColor = value); }
+            get { return _internalReplOutput.ResultColor; }
+            set { Execute.OnUiThread(()=>_internalReplOutput.ResultColor = value); }
         }
 
         public System.Windows.Media.Color WarningColor
         {
-            get { return internalReplOutput.WarningColor; }
-            set { Execute.OnUIThread(()=>internalReplOutput.WarningColor = value); }
+            get { return _internalReplOutput.WarningColor; }
+            set { Execute.OnUiThread(()=>_internalReplOutput.WarningColor = value); }
         }
 
         public System.Windows.Media.Color ErrorColor
         {
-            get { return internalReplOutput.ErrorColor; }
-            set { Execute.OnUIThread(()=>internalReplOutput.ErrorColor = value); }
+            get { return _internalReplOutput.ErrorColor; }
+            set { Execute.OnUiThread(()=>_internalReplOutput.ErrorColor = value); }
         }
 
         public System.Windows.Media.Color TextColor
         {
-            get { return internalReplOutput.TextColor; }
-            set { Execute.OnUIThread(()=>internalReplOutput.TextColor = value); }
+            get { return _internalReplOutput.TextColor; }
+            set { Execute.OnUiThread(()=>_internalReplOutput.TextColor = value); }
         }
         #endregion
        

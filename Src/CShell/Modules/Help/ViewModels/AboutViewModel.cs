@@ -16,10 +16,7 @@ namespace CShell.Modules.Help.ViewModels
             DisplayName = "About CShell";
         }
 
-        public string Version
-        {
-            get { return Assembly.GetExecutingAssembly().GetName().Version.ToString(); }
-        }
+        public string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         public string AboutText
         {

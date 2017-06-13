@@ -10,11 +10,11 @@ namespace CShell
 {
     public static partial class Shell
     {
-        private static readonly Lazy<Workspace> _workspaceLazy = new Lazy<Workspace>(() => IoC.Get<Workspace>());
+        private static readonly Lazy<Workspace> WorkspaceLazy = new Lazy<Workspace>(() => IoC.Get<Workspace>());
 
         /// <summary>
         /// Gets the instance of the currently open workspace.
         /// </summary>
-        public static Workspace Workspace { get { return _workspaceLazy.Value; } }
+        public static Workspace Workspace => WorkspaceLazy.Value;
     }
 }

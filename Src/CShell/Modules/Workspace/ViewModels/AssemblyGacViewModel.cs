@@ -11,42 +11,27 @@ namespace CShell.Modules.Workspace.ViewModels
 {
     public class AssemblyGacItemViewModel : PropertyChangedBase
     {
-        private readonly AssemblyName assemblyName;
+        private readonly AssemblyName _assemblyName;
         public AssemblyGacItemViewModel(AssemblyName assemblyName)
         {
-            this.assemblyName = assemblyName;
+            this._assemblyName = assemblyName;
         }
 
-        private bool isSelected;
+        private bool _isSelected;
         public bool IsSelected
         {
-            get { return isSelected; }
-            set { isSelected = value; NotifyOfPropertyChange(()=>IsSelected);}
+            get { return _isSelected; }
+            set { _isSelected = value; NotifyOfPropertyChange(()=>IsSelected);}
         }
 
-        public string Name
-        {
-            get { return AssemblyName.Name; }
-        }
+        public string Name => AssemblyName.Name;
 
-        public string Version
-        {
-            get { return AssemblyName.Version.ToString(); }
-        }
+        public string Version => AssemblyName.Version.ToString();
 
-        private string filePath = null;
-        public string FilePath
-        {
-            get
-            {
-                return filePath ?? (filePath = GlobalAssemblyCache.FindAssemblyInNetGac(AssemblyName));
-            }
-        }
+        private string _filePath = null;
+        public string FilePath => _filePath ?? (_filePath = GlobalAssemblyCache.FindAssemblyInNetGac(AssemblyName));
 
-        public AssemblyName AssemblyName
-        {
-            get { return assemblyName; }
-        }
+        public AssemblyName AssemblyName => _assemblyName;
     }
 
     public class AssemblyGacViewModel : Screen
@@ -58,14 +43,14 @@ namespace CShell.Modules.Workspace.ViewModels
             LatestVersionsOnly = true;
         }
 
-        private List<AssemblyGacItemViewModel> gacItems;
+        private List<AssemblyGacItemViewModel> _gacItems;
         private List<AssemblyGacItemViewModel> GacItems
         {
             get
             {
-                if(gacItems == null)
+                if(_gacItems == null)
                 {
-                    gacItems = new List<AssemblyGacItemViewModel>();
+                    _gacItems = new List<AssemblyGacItemViewModel>();
                     foreach (var assemblyName in GlobalAssemblyCache.GetAssemblyList())
                     {
                         var vm = new AssemblyGacItemViewModel(assemblyName);
@@ -78,10 +63,10 @@ namespace CShell.Modules.Workspace.ViewModels
                                 NotifyOfPropertyChange(() => CanOk);
                             }
                         };
-                        gacItems.Add(vm);
+                        _gacItems.Add(vm);
                     }
                 }
-                return gacItems;
+                return _gacItems;
             }
         }
 
@@ -93,10 +78,10 @@ namespace CShell.Modules.Workspace.ViewModels
                 if (LatestVersionsOnly)
                     items = items.GroupBy(item => item.Name).Select(group => group.OrderByDescending(item => item.AssemblyName.Version).First());
 
-                if (String.IsNullOrEmpty(searchText))
+                if (string.IsNullOrEmpty(_searchText))
                     return items;
                 else
-                    return items.Where(item => item.Name.ToLower().Contains(searchText.ToLower()));
+                    return items.Where(item => item.Name.ToLower().Contains(_searchText.ToLower()));
             }
         }
 
@@ -105,52 +90,40 @@ namespace CShell.Modules.Workspace.ViewModels
             get { return GacItems.Where(item => item.IsSelected); }
         }
 
-        public int SelectedAssemblyCount
-        {
-            get { return SelectedAssemblies.Count(); }
-        }
+        public int SelectedAssemblyCount => SelectedAssemblies.Count();
 
         /// <summary>
         /// Gets or sets the max count of allowed assemblies to be selected at once.
         /// </summary>
         public int MaxSelectedAssemblyCount { get; set; }
 
-        private string searchText;
+        private string _searchText;
         public string SearchText
         {
-            get { return searchText; }
+            get { return _searchText; }
             set
             {
-                searchText = value;
+                _searchText = value;
                 NotifyOfPropertyChange(() => Assemblies);
             }
         }
 
-        private bool latestVersionsOnly;
+        private bool _latestVersionsOnly;
         public bool LatestVersionsOnly
         {
-            get { return latestVersionsOnly; }
+            get { return _latestVersionsOnly; }
             set
             {
-                latestVersionsOnly = value;
+                _latestVersionsOnly = value;
                 NotifyOfPropertyChange(() => LatestVersionsOnly);
                 NotifyOfPropertyChange(() => Assemblies);
             }
         }
 
-        public bool CanOk
-        {
-            get { return SelectedAssemblies.Any() && SelectedAssemblyCount <= MaxSelectedAssemblyCount; }
-        }
+        public bool CanOk => SelectedAssemblies.Any() && SelectedAssemblyCount <= MaxSelectedAssemblyCount;
 
-        public void Ok()
-        {
-            TryClose(true);
-        }
+        public void Ok() => TryClose(true);
 
-        public void Cancel()
-        {
-            TryClose(false);
-        }
+        public void Cancel() => TryClose(false);
     }
 }

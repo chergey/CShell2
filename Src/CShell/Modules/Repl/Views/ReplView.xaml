@@ -6,6 +6,6 @@
              xmlns:controls="clr-namespace:CShell.Modules.Repl.Controls" mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <controls:CSRepl x:Name="repl" />
+        <controls:CsRepl x:Name="Repl" />
     </Grid>
 </UserControl>

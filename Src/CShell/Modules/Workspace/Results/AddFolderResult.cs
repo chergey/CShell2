@@ -10,11 +10,11 @@ namespace CShell.Modules.Workspace.Results
 {
     public class AddFolderResult : ResultBase
     {
-        private readonly string folder;
+        private readonly string _folder;
 
         public AddFolderResult(string folder)
         {
-            this.folder = folder;
+            this._folder = folder;
         }
 
         public override void Execute(Caliburn.Micro.CoroutineExecutionContext context)

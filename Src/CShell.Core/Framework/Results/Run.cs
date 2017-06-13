@@ -7,15 +7,9 @@ namespace CShell.Framework.Results
 {
     public static class Run
     {
-        public static RunCodeResult Code(string code, string sourceFile)
-        {
-            return new RunCodeResult(code, sourceFile);
-        }
+        public static RunCodeResult Code(string code, string sourceFile) => new RunCodeResult(code, sourceFile);
 
-        public static RunCodeResult Code(string code)
-        {
-            return new RunCodeResult(code);
-        }
+        public static RunCodeResult Code(string code) => new RunCodeResult(code);
 
         public static RunCodeResult File(string file)
         {

@@ -8,19 +8,19 @@ namespace CShell.Framework.Results
 {
     public class SaveDocumentResult : ResultBase
     {
-        private IDocument document;
-        private string newFile;
+        private IDocument _document;
+        private string _newFile;
 
         public SaveDocumentResult(IDocument document)
         {
-            if (document == null) throw new ArgumentNullException("document");
-            this.document = document;
+            if (document == null) throw new ArgumentNullException(nameof(document));
+            this._document = document;
         }
 
         public SaveDocumentResult(IDocument document, string newFile)
             :this(document)
         {
-            this.newFile = newFile;
+            this._newFile = newFile;
         }
 
         public override void Execute(CoroutineExecutionContext context)
@@ -28,13 +28,13 @@ namespace CShell.Framework.Results
             Exception ex = null;
             try
             {
-                if (!String.IsNullOrEmpty(newFile))
+                if (!String.IsNullOrEmpty(_newFile))
                 {
-                    document.SaveAs(newFile);
+                    _document.SaveAs(_newFile);
                 }
-                else if (document.IsDirty)
+                else if (_document.IsDirty)
                 {
-                    document.Save();
+                    _document.Save();
                 }
             }
             catch(Exception e)

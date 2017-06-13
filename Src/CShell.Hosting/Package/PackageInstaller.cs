@@ -20,7 +20,7 @@ namespace CShell.Hosting.Package
         {
             if (packageIds == null)
             {
-                throw new ArgumentNullException("packageIds");
+                throw new ArgumentNullException(nameof(packageIds));
             }
 
             packageIds = packageIds.ToList();

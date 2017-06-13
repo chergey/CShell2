@@ -15,8 +15,8 @@ namespace CShell.Modules.Workspace.Results
 {
     public class AddReferencesResult : ResultBase
     {
-        private readonly IEnumerable<string> assemblyPaths;
-        private readonly IEnumerable<AssemblyName> assemblyNames;
+        private readonly IEnumerable<string> _assemblyPaths;
+        private readonly IEnumerable<AssemblyName> _assemblyNames;
 
         public ITextDocument Document { get; private set; }
 
@@ -29,49 +29,49 @@ namespace CShell.Modules.Workspace.Results
         public AddReferencesResult(ITextDocument doc, string file)
         {
             this.Document = doc;
-            this.assemblyPaths = new[] { file };
+            this._assemblyPaths = new[] { file };
         }
 
         public AddReferencesResult(ITextDocument doc, IEnumerable<string> files)
         {
             this.Document = doc;
-            this.assemblyPaths = files;
+            this._assemblyPaths = files;
         }
 
         public AddReferencesResult(ITextDocument doc, AssemblyName assemblyName)
         {
             this.Document = doc;
-            this.assemblyNames = new[] { assemblyName };
+            this._assemblyNames = new[] { assemblyName };
         }
 
         public AddReferencesResult(ITextDocument doc, IEnumerable<AssemblyName> assemblyNames)
         {
             this.Document = doc;
-            this.assemblyNames = assemblyNames;
+            this._assemblyNames = assemblyNames;
         }
 
         public override void Execute(Caliburn.Micro.CoroutineExecutionContext context)
         {
-            Framework.Services.Execute.OnUIThreadEx(() =>
+            Framework.Services.Execute.OnUiThreadEx(() =>
             {
                 try
                 {
                     var refsToInsert = "";
-                    if (assemblyPaths != null)
+                    if (_assemblyPaths != null)
                     {
-                        foreach (var path in assemblyPaths)
+                        foreach (var path in _assemblyPaths)
                         {
                             refsToInsert += "#r \"" + GetReferencePath(path) + "\"" + Environment.NewLine;
                         }
                     }
-                    if (assemblyNames != null)
+                    if (_assemblyNames != null)
                     {
-                        foreach (var assemblyName in assemblyNames)
+                        foreach (var assemblyName in _assemblyNames)
                         {
                             refsToInsert += "#r \"" + assemblyName.FullName + "\"" + Environment.NewLine;
                         }
                     }
-                    if (!String.IsNullOrEmpty(refsToInsert))
+                    if (!string.IsNullOrEmpty(refsToInsert))
                     {
                         Document.Prepend(refsToInsert);
                         Workspace.ReplExecutor.Execute(refsToInsert, Document.DisplayName);

@@ -20,20 +20,20 @@ namespace CShell.Sinks.Charting
             DisplayName = GetTitle(uri, "Chart");
         }
 
-        private Chart chart;
+        private Chart _chart;
         public Chart Chart
         {
-            get { return chart ?? (chart = CreateChart()); }
+            get { return _chart ?? (_chart = CreateChart()); }
             set
             {
-                chart = value;
+                _chart = value;
                 NotifyOfPropertyChange(() => Chart);
             }
         }
 
         public override void Dump(object o)
         {
-            Execute.OnUIThreadEx(() =>
+            Execute.OnUiThreadEx(() =>
             {
                 try
                 {
@@ -57,10 +57,7 @@ namespace CShell.Sinks.Charting
             });
         }
 
-        public override void Clear()
-        {
-            Dump(CreateChart());
-        }
+        public override void Clear() => Dump(CreateChart());
 
         public static Chart CreateChart()
         {

@@ -42,9 +42,6 @@ namespace CShell.Framework.Services
 			}
 		}
 
-		public BitmapImage GetBitmap(string relativeUri)
-		{
-			return GetBitmap(relativeUri, ExtensionMethods.GetExecutingAssemblyName());
-		}
+		public BitmapImage GetBitmap(string relativeUri) => GetBitmap(relativeUri, ExtensionMethods.GetExecutingAssemblyName());
 	}
 }

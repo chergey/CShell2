@@ -30,9 +30,6 @@ namespace CShell.Framework.Menus
 
 		#endregion
 
-		public IEnumerable<IResult> Execute()
-		{
-			return _execute != null ? _execute() : new IResult[] { };
-		}
+		public IEnumerable<IResult> Execute() => _execute != null ? _execute() : new IResult[] { };
 	}
 }

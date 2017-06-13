@@ -18,7 +18,7 @@ namespace CShell.Hosting
 
         public ReplLogProvider(IReplOutput repl, LogLevel consoleLogLevel)
         {
-            if (repl == null) throw new ArgumentNullException("repl");
+            if (repl == null) throw new ArgumentNullException(nameof(repl));
 
             _consoleLogLevel = consoleLogLevel;
             _replOutput = repl;
@@ -49,7 +49,7 @@ namespace CShell.Hosting
         private readonly LogLevel _consoleLogLevel;
         private readonly IReplOutput _replOutput;
 
-        private readonly Dictionary<LogLevel, Color> colors =
+        private readonly Dictionary<LogLevel, Color> _colors =
             new Dictionary<LogLevel, Color>
             {
                 { LogLevel.Fatal, Colors.Red },
@@ -62,7 +62,7 @@ namespace CShell.Hosting
 
         internal ReplLog(string name, IReplOutput repl, LogLevel consoleLogLevel)
         {
-            if (repl == null) throw new ArgumentNullException("repl");
+            if (repl == null) throw new ArgumentNullException(nameof(repl));
 
             _name = name;
             _consoleLogLevel = consoleLogLevel;
@@ -72,13 +72,13 @@ namespace CShell.Hosting
 
         public bool Log(LogLevel logLevel, Func<string> messageFunc, Exception exception, params object[] formatParameters)
         {
-            string message = String.Empty;
+            string message = string.Empty;
             if (messageFunc != null)
             {
                 message = messageFunc();
             }
 
-            if (String.IsNullOrEmpty(message) && exception == null)
+            if (string.IsNullOrEmpty(message) && exception == null)
                 return true;
 
             //forward log messages to NLog
@@ -89,7 +89,7 @@ namespace CShell.Hosting
                 return true;
 
             if (formatParameters != null && formatParameters.Length > 0)
-                message = String.Format(message, formatParameters);
+                message = string.Format(message, formatParameters);
 
             var prefix = logLevel == LogLevel.Info
                 ? null
@@ -97,7 +97,7 @@ namespace CShell.Hosting
 
             var originalOutputColor = _replOutput.ResultColor;
             Color color;
-            if (!colors.TryGetValue(logLevel, out color))
+            if (!_colors.TryGetValue(logLevel, out color))
             {
                 color = Colors.Black;
             }

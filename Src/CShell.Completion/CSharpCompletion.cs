@@ -20,20 +20,20 @@ namespace CShell.Completion
 {
     public class CSharpCompletion : ICompletion
     {
-        private readonly bool isRepl;
-        private IProjectContent projectContent;
+        private readonly bool _isRepl;
+        private IProjectContent _projectContent;
 
         private CSharpCompletion(IProjectContent projectContent, bool isRepl)
         {
-            this.projectContent = projectContent;
-            this.isRepl = isRepl;
+            this._projectContent = projectContent;
+            this._isRepl = isRepl;
         }
 
         public CSharpCompletion(bool isRepl)
         {
-            this.isRepl = isRepl;
-            projectContent = new CSharpProjectContent();
-            var assemblies = new Assembly[]
+            this._isRepl = isRepl;
+            _projectContent = new CSharpProjectContent();
+            var assemblies = new[]
             {
                     typeof(object).Assembly, // mscorlib
 //                    typeof(Uri).Assembly, // System.dll
@@ -51,7 +51,7 @@ namespace CShell.Completion
 
         public string[] GetAssemblies()
         {
-            return projectContent.AssemblyReferences.OfType<IUnresolvedAssembly>().Select(aref => aref.Location).ToArray();
+            return _projectContent.AssemblyReferences.OfType<IUnresolvedAssembly>().Select(aref => aref.Location).ToArray();
         }
 
         public void AddAssembly(string file)
@@ -59,20 +59,19 @@ namespace CShell.Completion
             if (String.IsNullOrEmpty(file))
                 return;
 
-            var loader = new CecilLoader();
-            loader.DocumentationProvider = GetXmlDocumentation(file);
+            var loader = new CecilLoader {DocumentationProvider = GetXmlDocumentation(file)};
             var unresolvedAssembly = loader.LoadAssemblyFile(file);
-            projectContent = projectContent.AddAssemblyReferences(unresolvedAssembly);
+            _projectContent = _projectContent.AddAssemblyReferences(unresolvedAssembly);
         }
 
         public void RemoveAssembly(string file)
         {
-            if (String.IsNullOrEmpty(file))
+            if (string.IsNullOrEmpty(file))
                 return;
 
             var loader = new CecilLoader();
             var unresolvedAssembly = loader.LoadAssemblyFile(file);
-            projectContent = projectContent.RemoveAssemblyReferences(unresolvedAssembly);
+            _projectContent = _projectContent.RemoveAssemblyReferences(unresolvedAssembly);
         }
 
         public void ProcessInput(string input, string sourceFile)
@@ -88,7 +87,7 @@ namespace CShell.Completion
                 var syntaxTree = new CSharpParser().Parse(input, sourceFile);
                 syntaxTree.Freeze();
                 var unresolvedFile = syntaxTree.ToTypeSystem();
-                projectContent = projectContent.AddOrUpdateFiles(unresolvedFile);
+                _projectContent = _projectContent.AddOrUpdateFiles(unresolvedFile);
             }
         }
 
@@ -99,7 +98,7 @@ namespace CShell.Completion
             if (String.IsNullOrEmpty(document.FileName))
                 return result;
 
-            var completionContext = new CSharpCompletionContext(document, offset, projectContent, namespaces);
+            var completionContext = new CSharpCompletionContext(document, offset, _projectContent, namespaces);
 
             var completionFactory = new CSharpCompletionDataFactory(completionContext.TypeResolveContextAtCaret, completionContext);
             var cce = new CSharpCompletionEngine(
@@ -108,10 +107,12 @@ namespace CShell.Completion
                 completionFactory,
                 completionContext.ProjectContent,
                 completionContext.TypeResolveContextAtCaret
-                );
+                )
+            {
+                EolMarker = Environment.NewLine,
+                FormattingPolicy = FormattingOptionsFactory.CreateSharpDevelop()
+            };
 
-            cce.EolMarker = Environment.NewLine;
-            cce.FormattingPolicy = FormattingOptionsFactory.CreateSharpDevelop();
 
 
             var completionChar = completionContext.Document.GetCharAt(completionContext.Offset - 1);
@@ -203,7 +204,7 @@ namespace CShell.Completion
                 return;
 
             var unresolvedAssemblies = GetUnresolvedAssemblies(references);
-            projectContent = projectContent.AddAssemblyReferences((IEnumerable<IUnresolvedAssembly>)unresolvedAssemblies);
+            _projectContent = _projectContent.AddAssemblyReferences((IEnumerable<IUnresolvedAssembly>)unresolvedAssemblies);
         }
 
         public void RemoveReferences(params string[] references)
@@ -212,14 +213,11 @@ namespace CShell.Completion
                 return;
 
             var unresolvedAssemblies = GetUnresolvedAssemblies(references);
-            projectContent = projectContent.RemoveAssemblyReferences((IEnumerable<IUnresolvedAssembly>)unresolvedAssemblies);
+            _projectContent = _projectContent.RemoveAssemblyReferences((IEnumerable<IUnresolvedAssembly>)unresolvedAssemblies);
         }
 
 
-        public ICompletion Clone(bool isRepl = false)
-        {
-            return new CSharpCompletion(projectContent, isRepl);
-        }
+        public ICompletion Clone(bool isRepl = false) => new CSharpCompletion(_projectContent, isRepl);
 
 
         private static IUnresolvedAssembly[] GetUnresolvedAssemblies(string[] references)

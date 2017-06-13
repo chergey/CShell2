@@ -137,16 +137,10 @@ namespace CShell.Hosting.Package
                 .FirstOrDefault();
         }
 
-        private static bool IsValidFramework(FrameworkName frameworkName)
-        {
-            return frameworkName.Identifier == DotNetFramework
-                || (frameworkName.Identifier == DotNetPortable
-                    && frameworkName.Profile.Split('+').Any(IsValidProfile));
-        }
+        private static bool IsValidFramework(FrameworkName frameworkName) => frameworkName.Identifier == DotNetFramework
+                                                                             || (frameworkName.Identifier == DotNetPortable
+                                                                                 && frameworkName.Profile.Split('+').Any(IsValidProfile));
 
-        private static bool IsValidProfile(string profile)
-        {
-            return profile == "net40" || profile == "net45";
-        }
+        private static bool IsValidProfile(string profile) => profile == "net40" || profile == "net45";
     }
 }

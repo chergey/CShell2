@@ -13,25 +13,25 @@ namespace CShell.Framework.Results
         [Import]
         public Workspace Workspace { get; set; }
 
-        private readonly string code;
-        private readonly string sourceFile;
+        private readonly string _code;
+        private readonly string _sourceFile;
 
         public RunCodeResult(string code)
         {
-            this.code = code;
+            this._code = code;
         }
 
         public RunCodeResult(string code, string sourceFile)
         {
-            this.code = code;
-            this.sourceFile = sourceFile;
+            this._code = code;
+            this._sourceFile = sourceFile;
         }
 
         public override void Execute(CoroutineExecutionContext context)
         {
             if(Workspace != null && Workspace.ReplExecutor != null)
             {
-                Task.Run(() => Workspace.ReplExecutor.Execute(code, sourceFile))
+                Task.Run(() => Workspace.ReplExecutor.Execute(_code, _sourceFile))
                     .ContinueWith(t => OnCompleted(t.Exception));
             }
         }

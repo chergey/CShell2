@@ -12,14 +12,11 @@ namespace CShell.Modules.Repl.Views
 			InitializeComponent();
 		}
 
-		public void ScrollToEnd()
-		{
-			outputText.ScrollToEnd();
-		}
+		public void ScrollToEnd() => OutputText.ScrollToEnd();
 
-		public void SetText(string text)
+	    public void SetText(string text)
 		{
-			outputText.Text = text;
+			OutputText.Text = text;
 		}
 	}
 }

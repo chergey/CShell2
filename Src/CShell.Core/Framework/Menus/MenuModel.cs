@@ -20,9 +20,6 @@ namespace CShell.Framework.Menus
 			}
 		}
 
-		public void Add(params MenuItemBase[] items)
-		{
-			items.Apply(Add);
-		}
+		public void Add(params MenuItemBase[] items) => items.Apply(Add);
 	}
 }

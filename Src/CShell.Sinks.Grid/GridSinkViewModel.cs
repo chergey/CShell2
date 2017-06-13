@@ -16,7 +16,7 @@ namespace CShell.Sinks.Grid
             Uri = uri;
 
             DisplayName = GetTitle(uri, "Grid");
-            data = new List<object>();
+            _data = new List<object>();
         }
 
         public override void Dump(object o)
@@ -44,15 +44,15 @@ namespace CShell.Sinks.Grid
             Data = new List<object>();
         }
 
-        private List<object> data;
+        private List<object> _data;
         public List<object> Data
         {
-            get { return data; }
+            get { return _data; }
             set
             {
-                data = value;
+                _data = value;
 
-                if (lastItemType == null || lastItemType != ItemType)
+                if (_lastItemType == null || _lastItemType != ItemType)
                     InitializeItemProperties();
 
                 NotifyOfPropertyChange(() => Data);
@@ -60,13 +60,10 @@ namespace CShell.Sinks.Grid
             }
         }
 
-        public int DataCount
-        {
-            get { return Data.Count; }
-        }
+        public int DataCount => Data.Count;
 
         #region Type Properties
-        private Type lastItemType;
+        private Type _lastItemType;
         public Type ItemType
         {
             get
@@ -83,7 +80,7 @@ namespace CShell.Sinks.Grid
 
         private void InitializeItemProperties()
         {
-            lastItemType = ItemType;
+            _lastItemType = ItemType;
             Properties = new Collection<PropertyInfo>(GetProperties(ItemType));
 
             SelectedProperties = new Collection<PropertyInfo>(Properties
@@ -114,21 +111,16 @@ namespace CShell.Sinks.Grid
                 .Where(p => IsValueType(p.PropertyType)).ToList();
         }
 
-        private static bool IsValueType(Type type)
-        {
-            return type.IsPrimitive ||
-                   type == typeof(float) ||
-                   type == typeof(double) ||
-                   type == typeof(decimal);
-        }
+        private static bool IsValueType(Type type) => type.IsPrimitive ||
+                                                      type == typeof(float) ||
+                                                      type == typeof(double) ||
+                                                      type == typeof(decimal);
 
-        private static bool IsSimpleType(Type type)
-        {
-            return IsValueType(type) ||
-                   type == typeof (DateTime) ||
-                   type == typeof (TimeSpan) ||
-                   type == typeof (string);
-        }
+        private static bool IsSimpleType(Type type) => IsValueType(type) ||
+                                                       type == typeof (DateTime) ||
+                                                       type == typeof (TimeSpan) ||
+                                                       type == typeof (string);
+
         #endregion
 
     }

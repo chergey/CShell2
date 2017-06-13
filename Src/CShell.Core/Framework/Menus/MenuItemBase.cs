@@ -8,23 +8,17 @@ namespace CShell.Framework.Menus
 	{
 		#region Static stuff
 
-		public static MenuItemBase Separator
-		{
-			get { return new MenuItemSeparator(); }
-		}
+		public static MenuItemBase Separator => new MenuItemSeparator();
 
-		#endregion
+	    #endregion
 
 		#region Properties
 
 		public IObservableCollection<MenuItemBase> Children { get; private set; }
 
-		public virtual string Name
-		{
-			get { return "-"; }
-		}
+		public virtual string Name => "-";
 
-		#endregion
+	    #endregion
 
 		#region Constructors
 
@@ -35,19 +29,10 @@ namespace CShell.Framework.Menus
 
 		#endregion
 
-		public void Add(params MenuItemBase[] menuItems)
-		{
-			menuItems.Apply(Children.Add);
-		}
+		public void Add(params MenuItemBase[] menuItems) => menuItems.Apply(Children.Add);
 
-		public IEnumerator<MenuItemBase> GetEnumerator()
-		{
-			return Children.GetEnumerator();
-		}
+	    public IEnumerator<MenuItemBase> GetEnumerator() => Children.GetEnumerator();
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+	    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 }

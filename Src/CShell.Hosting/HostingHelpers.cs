@@ -24,7 +24,7 @@ namespace CShell.Hosting
             catalog.Catalogs.Add(new AssemblyCatalog(typeof(Common.Logging.LogManager).Assembly, hostingBuilder)); //Common.Logging
             catalog.Catalogs.Add(new AssemblyCatalog(typeof(IScriptEngine).Assembly, hostingBuilder)); //ScriptCS.Contracts
             catalog.Catalogs.Add(new AssemblyCatalog(typeof(ScriptServices).Assembly, hostingBuilder)); //ScriptCS.Core
-            catalog.Catalogs.Add(new AssemblyCatalog(typeof(RoslynScriptEngine).Assembly, hostingBuilder)); //CShell.Engine.Roslyn
+           catalog.Catalogs.Add(new AssemblyCatalog(typeof(RoslynScriptEngine).Assembly, hostingBuilder)); //CShell.Engine.Roslyn
             catalog.Catalogs.Add(new AssemblyCatalog(typeof(HostingHelpers).Assembly, hostingBuilder)); //CShell.Hosting
 
             //add singletons
@@ -45,7 +45,7 @@ namespace CShell.Hosting
             builder.ForType<FilePreProcessor>().SelectNonObsoleteConstructor().Export<IFilePreProcessor>();
 
             builder.ForType<ReplScriptHostFactory>().Export<IScriptHostFactory>();
-            builder.ForType<RoslynReplEngine>().SelectNonObsoleteConstructor().Export<IScriptEngine>();
+           builder.ForType<RoslynReplEngine>().SelectNonObsoleteConstructor().Export<IScriptEngine>();
             builder.ForType<ReplScriptExecutor>().Export<IRepl>();
 
             builder.ForType<PackageContainer>().Export<IPackageContainer>();

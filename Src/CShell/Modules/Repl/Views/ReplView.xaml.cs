@@ -14,9 +14,6 @@ namespace CShell.Modules.Repl.Views
             InitializeComponent();
         }
 
-        public IReplOutput GetReplOutput()
-        {
-            return repl;
-        }
+        public IReplOutput GetReplOutput() => Repl;
     }
 }
