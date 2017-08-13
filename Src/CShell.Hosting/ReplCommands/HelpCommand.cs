@@ -8,6 +8,7 @@ using ScriptCs.Contracts;
 
 namespace CShell.Hosting.ReplCommands
 {
+    /*
     public class HelpCommand : IReplCommand
     {
         private readonly IReplOutput _replOutput;
@@ -31,4 +32,5 @@ namespace CShell.Hosting.ReplCommands
             return null;
         }
     }
+    */
 }

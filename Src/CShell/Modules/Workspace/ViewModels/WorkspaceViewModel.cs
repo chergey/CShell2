@@ -25,6 +25,7 @@ namespace CShell.Modules.Workspace.ViewModels
             DisplayName = "Workspace Explorer";
 	        this._workspace = workspace;
             this._workspace.PropertyChanged += WorkspaceOnPropertyChanged;
+         //   WorkspaceOnPropertyChanged(null,new PropertyChangedEventArgs("WorkspaceDirectory"));
         }
 
 	    #region Display

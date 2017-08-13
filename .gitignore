@@ -2,6 +2,11 @@
 [Bb]in/
 [Oo]bj/
 
+# when openning the project with Rider
+.idea/
+
+.vs/
+
 # mstest test results
 TestResults
 

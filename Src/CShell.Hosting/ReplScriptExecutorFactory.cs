@@ -1,5 +1,6 @@
 ﻿using CShell.Framework.Services;
 using ScriptCs;
+using ScriptCs.Contracts;
 
 namespace CShell.Hosting
 {
@@ -8,12 +9,14 @@ namespace CShell.Hosting
         private readonly IReplOutput _replOutput;
         private readonly IDefaultReferences _defaultReferences;
         private readonly ScriptServices _scriptServices;
+        private readonly IScriptInfo _scriptInfo;
 
-        public ReplScriptExecutorFactory(ScriptServices scriptServices, IReplOutput replOutput, IDefaultReferences defaultReferences)
+        public ReplScriptExecutorFactory(ScriptServices scriptServices, IReplOutput replOutput, IDefaultReferences defaultReferences, IScriptInfo scriptInfo)
         {
-            this._scriptServices = scriptServices;
-            this._replOutput = replOutput;
-            this._defaultReferences = defaultReferences;
+            _scriptServices = scriptServices;
+            _replOutput = replOutput;
+            _defaultReferences = defaultReferences;
+            _scriptInfo = scriptInfo;
         }
 
         public IReplScriptExecutor Create(string workspaceDirectory)
@@ -29,7 +32,8 @@ namespace CShell.Hosting
                 _scriptServices.Engine,
                 _scriptServices.LogProvider,
                 _scriptServices.ReplCommands,
-                _defaultReferences
+                _defaultReferences, 
+                _scriptInfo
                 );
 
             var assemblies = _scriptServices.AssemblyResolver.GetAssemblyPaths(_scriptServices.FileSystem.CurrentDirectory);

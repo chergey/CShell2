@@ -7,6 +7,7 @@ using Logger = ScriptCs.Contracts.Logger;
 
 namespace CShell.Hosting
 {
+    
     public class ReplLogProvider : ILogProvider
     {
         private readonly LogLevel _consoleLogLevel;
@@ -18,10 +19,8 @@ namespace CShell.Hosting
 
         public ReplLogProvider(IReplOutput repl, LogLevel consoleLogLevel)
         {
-            if (repl == null) throw new ArgumentNullException(nameof(repl));
-
             _consoleLogLevel = consoleLogLevel;
-            _replOutput = repl;
+            _replOutput = repl ?? throw new ArgumentNullException(nameof(repl));
         }
 
         public Logger GetLogger(string name)
@@ -62,11 +61,9 @@ namespace CShell.Hosting
 
         internal ReplLog(string name, IReplOutput repl, LogLevel consoleLogLevel)
         {
-            if (repl == null) throw new ArgumentNullException(nameof(repl));
-
             _name = name;
             _consoleLogLevel = consoleLogLevel;
-            _replOutput = repl;
+            _replOutput = repl ?? throw new ArgumentNullException(nameof(repl));
             _nlogLogger = NLog.LogManager.GetLogger(name);
         }
 

@@ -18,12 +18,7 @@ namespace CShell.Hosting.Package
 
         public void InstallPackages(IEnumerable<IPackageReference> packageIds, bool allowPreRelease = false)
         {
-            if (packageIds == null)
-            {
-                throw new ArgumentNullException(nameof(packageIds));
-            }
-
-            packageIds = packageIds.ToList();
+            packageIds = packageIds?.ToList() ?? throw new ArgumentNullException(nameof(packageIds));
 
             if (!packageIds.Any())
             {

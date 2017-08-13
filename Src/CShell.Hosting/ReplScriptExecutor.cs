@@ -25,8 +25,9 @@ namespace CShell.Hosting
             IScriptEngine scriptEngine,
             ILogProvider logProvider,
             IEnumerable<IReplCommand> replCommands,
-            IDefaultReferences defaultReferences)
-            : base(fileSystem, filePreProcessor, scriptEngine, logProvider)
+            IDefaultReferences defaultReferences, 
+            IScriptInfo scriptInfo)
+            : base(fileSystem, filePreProcessor, scriptEngine, logProvider, scriptInfo)
         {
             this._replOutput = replOutput;
             this._serializer = serializer;

@@ -5,6 +5,7 @@ using ScriptCs.Contracts;
 
 namespace CShell.Hosting.ReplCommands
 {
+    /*
     public class InstallCommand : IReplCommand
     {
         private readonly IPackageInstaller _packageInstaller;
@@ -67,4 +68,5 @@ namespace CShell.Hosting.ReplCommands
             return null;
         }
     }
+    */
 }

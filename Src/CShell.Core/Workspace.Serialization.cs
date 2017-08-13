@@ -18,8 +18,7 @@ namespace CShell
         private void SaveLayout()
         {
             var path = Path.Combine(WorkspaceDirectory, Constants.LayoutFile);
-            var settings = new XmlWriterSettings();
-            settings.Indent = true;
+            var settings = new XmlWriterSettings {Indent = true};
             var windowLocation = _shell.GetWindowLocation();
 
             var serializer = new XmlSerializer(typeof(WindowLocation));
@@ -39,8 +38,7 @@ namespace CShell
             if(!File.Exists(path))
                 return;
 
-            var settings = new XmlReaderSettings();
-            settings.IgnoreWhitespace = true;
+            var settings = new XmlReaderSettings {IgnoreWhitespace = true};
 
             var serializer = new XmlSerializer(typeof(WindowLocation));
             using (var xmlReader = XmlReader.Create(path, settings))

@@ -2,6 +2,7 @@
 
 namespace CShell.Hosting.ReplCommands
 {
+    /*
     public class ResetCommand : IReplCommand
     {
         public string CommandName => "reset";
@@ -14,4 +15,5 @@ namespace CShell.Hosting.ReplCommands
             return null;
         }
     }
+    */
 }

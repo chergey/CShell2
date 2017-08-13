@@ -12,7 +12,7 @@ namespace CShell.Framework.Results
 {
     public class ChangeWorkspaceResult : ResultBase
     {
-        private string _workspaceDirectory;
+        private readonly string _workspaceDirectory;
 
         [Import]
         private Workspace _workspace;

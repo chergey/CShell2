@@ -34,7 +34,7 @@ namespace CShell.Modules.Editors.ViewModels
 
         public EditorViewModel(CShell.Workspace workspace)
 	    {
-	        this._workspace = workspace;
+	        _workspace = workspace;
 	    }
 
 	    public string File => _path;
@@ -43,8 +43,8 @@ namespace CShell.Modules.Editors.ViewModels
 
 		public override bool IsDirty
 		{
-			get { return _isDirty; }
-            set
+			get => _isDirty;
+		    set
             {
                 if (value == _isDirty)
                     return;
@@ -107,7 +107,7 @@ namespace CShell.Modules.Editors.ViewModels
 
             _textEditor.TextChanged += delegate
 			{
-                IsDirty = string.Compare(_originalText, _textEditor.Text) != 0;
+                IsDirty = string.CompareOrdinal(_originalText, _textEditor.Text) != 0;
 			};
 
             //some other settings
@@ -116,7 +116,7 @@ namespace CShell.Modules.Editors.ViewModels
 		    _textEditor.ShowLineNumbers = true;
             _textEditor.SyntaxHighlighting = GetHighlighting(extension);
 
-		    if (_workspace != null && _workspace.ReplExecutor.DocumentCompletion != null && (extension == ".cs" || extension == ".csx"))
+		    if (_workspace != null && _workspace.ReplExecutor?.DocumentCompletion != null && (extension == ".cs" || extension == ".csx"))
 		    {
 		        _textEditor.Completion = _workspace.ReplExecutor.DocumentCompletion;
 		        _textEditor.ReplExecutor = _workspace.ReplExecutor;

@@ -29,6 +29,9 @@ namespace CShell
             this._replExecutorFactory = replExecutorFactory;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IReplScriptExecutor ReplExecutor => _replExecutor;
 
         public string WorkspaceDirectory { get; private set; }

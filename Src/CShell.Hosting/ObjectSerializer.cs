@@ -7,7 +7,7 @@ using ScriptCs.Contracts;
 
 namespace CShell.Hosting
 {
-    class ObjectSerializer : IObjectSerializer
+    internal class ObjectSerializer : IObjectSerializer
     {
         public string Serialize(object value)
         {
@@ -34,14 +34,8 @@ namespace CShell.Hosting
 
         public ConsoleColor ForegroundColor
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
         }
 
         public int Width { get; }

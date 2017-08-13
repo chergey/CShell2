@@ -52,7 +52,7 @@ namespace CShell.Hosting.Package
             }
 
             var sourceProvider = new PackageSourceProvider(settings);
-            var sources = sourceProvider.LoadPackageSources().Where(i => i.IsEnabled == true);
+            var sources = sourceProvider.LoadPackageSources().Where(i => i.IsEnabled);
 
             if (sources == null || !sources.Any())
             {

@@ -5,6 +5,7 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.ReflectionModel;
 using System.ComponentModel.Composition.Registration;
+using System.DirectoryServices;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -17,12 +18,14 @@ using Caliburn.Micro;
 using CShell.Hosting;
 using ScriptCs;
 using ScriptCs.Contracts;
+using ILog = ScriptCs.Contracts.ILog;
 using IModule = CShell.Framework.IModule;
 
 namespace CShell
 {
     public class AppBootstrapper : Caliburn.Micro.BootstrapperBase
     {
+        
         static AppBootstrapper()
         {
 
@@ -40,7 +43,7 @@ namespace CShell
 
         private CompositionContainer _container;
         private List<IModule> _modules;
-
+        
         /// <summary>
         /// By default, we are configured to use MEF
         /// </summary>
@@ -48,6 +51,7 @@ namespace CShell
         {
             //add CShell assemblies, this .exe assembly is already added
             AssemblySource.Instance.Add(typeof(IShell).Assembly);
+           // AssemblySource.Instance.Add(typeof(Printers).Assembly);
 
             //load modules
             var exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -92,11 +96,16 @@ namespace CShell
             var batch = new CompositionBatch();
             batch.AddExportedValue<IWindowManager>(new WindowManager());
             batch.AddExportedValue<IEventAggregator>(new EventAggregator());
+          //  batch.AddExportedValue<IScriptInfo>(new ScriptInfo());
+          //  batch.AddExportedValue<ILog>(new ReplLog());
+           // batch.AddExportedValue<Printers>(new Printers(new ObjectSerializer()));
             batch.AddExportedValue(_container);
             _container.Compose(batch);
-
+        
             //use this for testing the MEF dependency resolution
-            //HostingHelpers.TestIfAllExportsCanBeResolved(container);
+            HostingHelpers.TestIfAllExportsCanBeResolved(_container);
+            
+            
 
             //configure the modules
             _modules = _container.GetExportedValues<IModule>().ToList();

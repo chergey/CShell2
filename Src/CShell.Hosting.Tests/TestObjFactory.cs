@@ -34,7 +34,7 @@ namespace CShell.Hosting.Tests
             {
                 new ReplCommands.HelpCommand(this.ReplOutput),
                 new ReplCommands.ClearCommand(this.ReplOutput),
-                new ReplCommands.ResetCommand(),
+                new ResetCommand(),
                 new ReplCommands.InstallCommand(PackageInstaller, PackageAssemblyResolver, Log, InstallationProvider),
             };
         }
@@ -45,18 +45,19 @@ namespace CShell.Hosting.Tests
             this.ScriptEngine,
             this.LogProvider,
             this.Commands,
-            this.DefaultReferences
+            this.DefaultReferences,
+            this.ScriptInfo
             );
 
         public ILog Log { get; private set; }
         public ILogProvider LogProvider { get; private set; }
 
-        public IReplOutput ReplOutput { get;private set; }
-        public IRepl Repl { get;private set; }
+        public IReplOutput ReplOutput { get; private set; }
+        public IRepl Repl { get; private set; }
         public IScriptEngine ScriptEngine { get; private set; }
         public List<IReplCommand> Commands { get; private set; }
 
-
+        public IScriptInfo ScriptInfo { get; private set; }
         public IDefaultReferences DefaultReferences { get; private set; }
         public IObjectSerializer ObjectSerializer { get; private set; }
 

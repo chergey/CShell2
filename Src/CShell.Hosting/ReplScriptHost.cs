@@ -6,8 +6,8 @@ namespace CShell.Hosting
 {
     public class ReplScriptHost : ScriptHost
     {
-        public ReplScriptHost(IScriptPackManager scriptPackManager, ScriptEnvironment environment)
-            : base(scriptPackManager, environment)
+        public ReplScriptHost(IScriptPackManager scriptPackManager,  string[] scriptArgs)
+            : base(scriptPackManager, new ScriptEnvironment(scriptArgs, null, null))
         {
         }
     }
@@ -15,6 +15,6 @@ namespace CShell.Hosting
     public class ReplScriptHostFactory : IScriptHostFactory
     {
         public IScriptHost CreateScriptHost(IScriptPackManager scriptPackManager, string[] scriptArgs) 
-            => new ReplScriptHost(scriptPackManager, new ScriptEnvironment(scriptArgs));
+            => new ReplScriptHost(scriptPackManager, scriptArgs);
     }
 }
